@@ -11,7 +11,7 @@ export default function BOMEditor() {
   const [materials, setMaterials] = useState([])
   const [search, setSearch] = useState('')
   const [sort, setSort] = useState({ key: 'materialId', dir: 'asc' })
-  const [selectedCols, setSelectedCols] = useState(['materialId','quantityPerUnit','wasteFactor'])
+  const [selectedCols, setSelectedCols] = useState(['materialId','quantityPerUnit','scrapPercent'])
 
   const { data: formulaData, isLoading, refetch } = useQuery({
     queryKey: ['piece-bom', pieceId],
@@ -36,7 +36,7 @@ export default function BOMEditor() {
     mutationFn: ({ pieceId, materials }) => materialService.validatePieceFormula(pieceId, materials)
   })
 
-  const addRow = () => setMaterials(prev => [...prev, { materialId: '', quantityPerUnit: 0, wasteFactor: 1 }])
+  const addRow = () => setMaterials(prev => [...prev, { materialId: '', quantityPerUnit: 0, scrapPercent: 0 }])
   const removeRow = (idx) => setMaterials(prev => prev.filter((_,i) => i!==idx))
   const updateRow = (idx, field, value) => setMaterials(prev => prev.map((r,i)=> i===idx ? { ...r, [field]: value } : r))
 
@@ -47,9 +47,9 @@ export default function BOMEditor() {
   }
 
   const exportCSV = () => {
-    const headers = ['material_id','quantity_per_unit','waste_factor']
+    const headers = ['material_id','quantity_per_unit','scrap_percent']
     const sep = ','
-    const lines = materials.map(m => [m.materialId ?? '', m.quantityPerUnit ?? '', m.wasteFactor ?? ''].join(sep))
+    const lines = materials.map(m => [m.materialId ?? '', m.quantityPerUnit ?? '', m.scrapPercent ?? ''].join(sep))
     const csv = [headers.join(sep), ...lines].join('\n')
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
@@ -68,8 +68,8 @@ export default function BOMEditor() {
     doc.text(`Pieza: ${pieceId}`, 40, 58)
     doc.autoTable({
       startY: 70,
-      head: [['Material ID','Consumo por UM','Factor Desperdicio']],
-      body: materials.map(m => [m.materialId ?? '', m.quantityPerUnit ?? '', m.wasteFactor ?? ''])
+      head: [['Material ID','Consumo por UM','Scrap (%)']],
+      body: materials.map(m => [m.materialId ?? '', m.quantityPerUnit ?? '', m.scrapPercent ?? ''])
     })
     doc.save(`bom_piece_${pieceId}.pdf`)
   }
@@ -104,7 +104,7 @@ export default function BOMEditor() {
       <div className="bg-white border rounded overflow-hidden">
         <div className="p-3 border-b flex flex-wrap gap-3 items-center text-sm">
           <span className="text-gray-600">Columnas:</span>
-          {['materialId','quantityPerUnit','wasteFactor'].map(k => (
+          {['materialId','quantityPerUnit','scrapPercent'].map(k => (
             <label key={k} className="inline-flex items-center gap-2">
               <input type="checkbox" checked={selectedCols.includes(k)} onChange={e => setSelectedCols(prev => e.target.checked ? [...prev, k] : prev.filter(x => x !== k))} />
               <span>{k}</span>
@@ -124,9 +124,9 @@ export default function BOMEditor() {
                   <button onClick={() => setSort(prev => ({ key: 'quantityPerUnit', dir: prev.dir === 'asc' ? 'desc' : 'asc' }))} className="inline-flex items-center gap-1">Consumo por UM</button>
                 </th>
               )}
-              {selectedCols.includes('wasteFactor') && (
+              {selectedCols.includes('scrapPercent') && (
                 <th className="text-right p-2">
-                  <button onClick={() => setSort(prev => ({ key: 'wasteFactor', dir: prev.dir === 'asc' ? 'desc' : 'asc' }))} className="inline-flex items-center gap-1">Factor Desperdicio</button>
+                  <button onClick={() => setSort(prev => ({ key: 'scrapPercent', dir: prev.dir === 'asc' ? 'desc' : 'asc' }))} className="inline-flex items-center gap-1">Scrap (%)</button>
                 </th>
               )}
               <th className="p-2 text-right">Acciones</th>
@@ -154,11 +154,12 @@ export default function BOMEditor() {
                         className="w-32 text-right px-2 py-1 border rounded"/>
                     </td>
                   )}
-                  {selectedCols.includes('wasteFactor') && (
+                  {selectedCols.includes('scrapPercent') && (
                     <td className="p-2 text-right">
-                      <input type="number" step="0.01" value={row.wasteFactor ?? 1}
-                        onChange={e => updateRow(idx, 'wasteFactor', Number(e.target.value))}
-                        className="w-28 text-right px-2 py-1 border rounded"/>
+                      <input type="number" step="0.1" min="0" max="100" value={row.scrapPercent ?? 0}
+                        onChange={e => updateRow(idx, 'scrapPercent', Number(e.target.value))}
+                        className="w-28 text-right px-2 py-1 border rounded"
+                        placeholder="0-100"/>
                     </td>
                   )}
                   <td className="p-2 text-right">

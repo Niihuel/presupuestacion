@@ -12,11 +12,13 @@ import {
   MapPin,
   AlertCircle,
   Check,
-  Search
+  Search,
+  Eye
 } from 'lucide-react';
 import { useZones } from '@compartido/hooks/useZonesHook';
 import { useMaterials } from '@compartido/hooks/useMaterialsHook';
 import materialService from '@compartido/services/material.service';
+import MaterialWhereUsed from '@componentes/materials/components/MaterialWhereUsed';
 
 const MaterialsPrices = () => {
   const [selectedZone, setSelectedZone] = useState('');
@@ -30,6 +32,8 @@ const MaterialsPrices = () => {
   const [isClosingMonth, setIsClosingMonth] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
   const [showOnlyChanged, setShowOnlyChanged] = useState(false);
+  const [showWhereUsed, setShowWhereUsed] = useState(false);
+  const [selectedMaterial, setSelectedMaterial] = useState(null);
 
   const { data: zonesData } = useZones();
   const { data: materialsData } = useMaterials();
@@ -202,6 +206,14 @@ const MaterialsPrices = () => {
   const getDeltaIcon = (delta) => {
     if (!delta) return null;
     return delta > 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />;
+  };
+
+  const handleWhereUsed = (materialId) => {
+    const material = materials.find(m => m.id === materialId);
+    if (material) {
+      setSelectedMaterial(material);
+      setShowWhereUsed(true);
+    }
   };
 
   // Filtrar precios
@@ -415,6 +427,9 @@ const MaterialsPrices = () => {
                       <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Variación
                       </th>
+                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Acciones
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
@@ -451,6 +466,16 @@ const MaterialsPrices = () => {
                               {price.delta.toFixed(2)}%
                             </span>
                           )}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-center">
+                          <button
+                            onClick={() => handleWhereUsed(price.material_id)}
+                            className="px-2 py-1 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors flex items-center gap-1 mx-auto"
+                            title="Ver dónde se usa"
+                          >
+                            <Eye className="h-4 w-4" />
+                            <span className="text-xs">Dónde se usa</span>
+                          </button>
                         </td>
                       </tr>
                     ))}
@@ -491,6 +516,16 @@ const MaterialsPrices = () => {
           )}
         </div>
       )}
+
+      {/* Modal Where-Used */}
+      <MaterialWhereUsed
+        material={selectedMaterial}
+        isOpen={showWhereUsed}
+        onClose={() => {
+          setShowWhereUsed(false);
+          setSelectedMaterial(null);
+        }}
+      />
     </div>
   );
 };

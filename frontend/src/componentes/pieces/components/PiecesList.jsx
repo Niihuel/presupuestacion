@@ -23,7 +23,7 @@ import {
 import { usePieces, useDeletePiece } from '@compartido/hooks/usePiecesHook';
 import PieceCard from './PieceCard';
 // Importar el modal desde el mismo directorio para evitar rutas incorrectas
-import PieceModal from './PieceModal';
+import PieceModalComplete from './PieceModalComplete';
 import DeleteConfirmModal from '@compartido/components/DeleteConfirmModal';
 import LoadingSpinner from '@compartido/components/LoadingSpinner';
 import Paginacion from '@compartido/components/Paginacion';
@@ -292,7 +292,7 @@ const PiecesList = () => {
       )}
 
       {/* Modales */}
-      <PieceModal
+      <PieceModalComplete
         isOpen={isModalOpen}
         onClose={handleModalClose}
         piece={selectedPiece}

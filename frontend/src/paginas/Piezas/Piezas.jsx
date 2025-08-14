@@ -39,7 +39,7 @@ import {
 import { useZones } from '@compartido/hooks/useZonesHook';
 
 // Componentes
-import PieceModal from '@componentes/pieces/components/PieceModal';
+import PieceModalComplete from '@componentes/pieces/components/PieceModalComplete';
 import PieceViewModal from '@componentes/pieces/components/PieceViewModal';
 import DeleteConfirmModal from '@compartido/components/DeleteConfirmModal';
 import { useNotifications } from '@compartido/hooks/useNotifications';
@@ -543,7 +543,7 @@ const Piezas = () => {
       )}
 
       {/* Modales */}
-      <PieceModal
+      <PieceModalComplete
         isOpen={showPieceModal}
         onClose={handleModalClose}
         piece={selectedPiece}

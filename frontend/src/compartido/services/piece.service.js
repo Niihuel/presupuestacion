@@ -98,25 +98,76 @@ class PieceService {
   }
 
   // ==============================
-  // TVF v1: cálculo y publicación
+  // TVF v2: cálculo completo y publicación
   // ==============================
 
+  /**
+   * Calcular precio usando TVF v2 con desglose completo
+   * @param {number} pieceId - ID de la pieza
+   * @param {number} zoneId - ID de la zona
+   * @param {string} asOfDate - Fecha para cálculo (YYYY-MM-DD)
+   * @param {boolean} compare - Si incluir comparación con mes anterior
+   * @returns {Promise} Desglose de costos y comparación
+   */
+  async calculatePiecePrice(pieceId, zoneId, asOfDate = null, compare = false) {
+    try {
+      const params = {
+        zone_id: zoneId,
+        as_of_date: asOfDate || new Date().toISOString().split('T')[0],
+        compare: compare
+      };
+      
+      const response = await api.get(`/pieces/${pieceId}/calculate-price`, { params });
+      return response?.data;
+    } catch (error) {
+      console.error('Error calculating piece price:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Publicar precio de pieza para una fecha efectiva
+   * @param {number} pieceId - ID de la pieza
+   * @param {object} data - Datos de publicación
+   * @returns {Promise} Resultado de publicación
+   */
+  async publishPiecePrice(pieceId, data) {
+    try {
+      const response = await api.post(`/pieces/${pieceId}/publish-price`, data);
+      return response?.data;
+    } catch (error) {
+      console.error('Error publishing piece price:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Obtener histórico de precios de una pieza
+   * @param {number} pieceId - ID de la pieza
+   * @param {number} zoneId - ID de la zona (opcional)
+   * @param {number} limit - Límite de registros
+   * @returns {Promise} Histórico con deltas
+   */
+  async getPieceHistory(pieceId, zoneId = null, limit = 12) {
+    try {
+      const params = { limit };
+      if (zoneId) params.zone_id = zoneId;
+      
+      const response = await api.get(`/pieces/${pieceId}/history`, { params });
+      return response?.data;
+    } catch (error) {
+      console.error('Error fetching piece history:', error);
+      throw error;
+    }
+  }
+
+  // Legacy support (TVF v1)
   async getTVFPrice(pieceId, { zone_id, as_of = null }) {
     try {
       const response = await api.get(`/pieces/${pieceId}/price`, { params: { zone_id, as_of } });
       return response?.data?.data || null;
     } catch (error) {
       console.error('Error calculating TVF price:', error);
-      throw error;
-    }
-  }
-
-  async publishPiecePrice(pieceId, { zone_id, as_of = null, effective_date = null }) {
-    try {
-      const response = await api.post(`/pieces/${pieceId}/publish-price`, { zone_id, as_of, effective_date });
-      return response?.data;
-    } catch (error) {
-      console.error('Error publishing piece price:', error);
       throw error;
     }
   }

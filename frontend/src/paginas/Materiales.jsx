@@ -50,6 +50,7 @@ import MaterialViewModal from '@features/materials/components/MaterialViewModal.
 import MaterialDeleteModal from '@features/materials/components/MaterialDeleteModal.jsx';
 import MaterialStockModal from '@features/materials/components/MaterialStockModal.jsx';
 import MaterialPriceHistoryModal from '@features/materials/components/MaterialPriceHistoryModal.jsx';
+import MaterialWhereUsed from '@componentes/materials/components/MaterialWhereUsed';
 import DialogoConfirmacion from '@compartido/components/DialogoConfirmacion';
 
 const Materiales = () => {
@@ -60,6 +61,7 @@ const Materiales = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isStockModalOpen, setIsStockModalOpen] = useState(false);
   const [isPriceHistoryModalOpen, setIsPriceHistoryModalOpen] = useState(false);
+  const [isWhereUsedModalOpen, setIsWhereUsedModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('create'); // 'create' | 'edit'
   
   // Filtros y búsqueda
@@ -147,6 +149,11 @@ const Materiales = () => {
   const handleViewMaterial = (material) => {
     setSelectedMaterial(material);
     setIsViewModalOpen(true);
+  };
+
+  const handleWhereUsed = (material) => {
+    setSelectedMaterial(material);
+    setIsWhereUsedModalOpen(true);
   };
 
   const handleDeleteMaterial = (material) => {
@@ -391,6 +398,7 @@ const Materiales = () => {
                 onDelete={handleDeleteMaterial}
                 onManageStock={handleManageStock}
                 onViewPriceHistory={handleViewPriceHistory}
+                onWhereUsed={handleWhereUsed}
               />
             ))}
           </div>
@@ -474,6 +482,16 @@ const Materiales = () => {
           onClose={handleModalClose}
         />
       )}
+
+      {/* Modal Where-Used */}
+      <MaterialWhereUsed
+        material={selectedMaterial}
+        isOpen={isWhereUsedModalOpen}
+        onClose={() => {
+          setIsWhereUsedModalOpen(false);
+          setSelectedMaterial(null);
+        }}
+      />
     </div>
   );
 };

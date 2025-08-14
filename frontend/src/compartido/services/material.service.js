@@ -417,6 +417,115 @@ class MaterialService {
     const response = await api.post('/materials/prices/close-month', { zone_id, month_date });
     return response.data?.data || [];
   }
+
+  // ===========================================
+  // WHERE-USED Y ANÁLISIS DE IMPACTO
+  // ===========================================
+
+  /**
+   * Obtener piezas que utilizan este material (Where-Used)
+   * @param {number} materialId - ID del material
+   * @param {number} zoneId - ID de la zona
+   * @param {string} monthDate - Fecha del mes (YYYY-MM-DD)
+   * @returns {Promise} Lista de piezas afectadas con análisis de impacto
+   */
+  async getWhereUsed(materialId, zoneId, monthDate) {
+    try {
+      const { data } = await api.get(`/materials/${materialId}/where-used`, {
+        params: {
+          zone_id: zoneId,
+          month_date: monthDate
+        }
+      });
+      return data;
+    } catch (error) {
+      console.error('Error getting where-used:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Recalcular impacto de cambio de precio en piezas
+   * @param {number} materialId - ID del material
+   * @param {number} zoneId - ID de la zona
+   * @param {string} monthDate - Fecha del mes
+   * @returns {Promise} Análisis de impacto con nuevos precios
+   */
+  async recalculateImpact(materialId, zoneId, monthDate) {
+    try {
+      const { data } = await api.post('/materials/recalculate-impact', {
+        material_id: materialId,
+        zone_id: zoneId,
+        month_date: monthDate
+      });
+      return data;
+    } catch (error) {
+      console.error('Error recalculating impact:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Cerrar mes para precios de materiales (mejorado)
+   * @param {number} zoneId - ID de la zona
+   * @param {string} monthDate - Fecha del mes a cerrar
+   * @returns {Promise} Resultado del cierre
+   */
+  async closeMonth(zoneId, monthDate) {
+    try {
+      const { data } = await api.post('/materials/close-month', {
+        zone_id: zoneId,
+        month_date: monthDate
+      });
+      return data;
+    } catch (error) {
+      console.error('Error closing month:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Importar precios desde CSV
+   * @param {number} zoneId - ID de la zona
+   * @param {string} monthDate - Fecha del mes
+   * @param {array} csvData - Datos CSV parseados
+   * @returns {Promise} Resultado de importación
+   */
+  async importFromCSV(zoneId, monthDate, csvData) {
+    try {
+      const { data } = await api.post('/materials/import-csv', {
+        zone_id: zoneId,
+        month_date: monthDate,
+        data: csvData
+      });
+      return data;
+    } catch (error) {
+      console.error('Error importing from CSV:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Exportar precios a CSV
+   * @param {number} zoneId - ID de la zona
+   * @param {string} monthDate - Fecha del mes
+   * @returns {Promise} Datos CSV
+   */
+  async exportToCSV(zoneId, monthDate) {
+    try {
+      const { data } = await api.get('/materials/export-csv', {
+        params: {
+          zone_id: zoneId,
+          month_date: monthDate
+        },
+        responseType: 'text'
+      });
+      return data;
+    } catch (error) {
+      console.error('Error exporting to CSV:', error);
+      throw error;
+    }
+  }
 }
 
 export const materialService = new MaterialService();

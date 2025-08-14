@@ -1,4 +1,7 @@
 /**
+ * @deprecated - Use PieceModalComplete instead
+ * TODO: Remove after migration to TVF v2 complete
+ * 
  * Modal para crear/editar piezas con BOM y cálculo de precio
  * 
  * Formulario completo con validación para gestión de piezas

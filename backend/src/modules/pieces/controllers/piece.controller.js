@@ -1,395 +1,755 @@
 // modules/pieces/controllers/piece.controller.js
-const { Piece, Zone, PiecePrice } = require('../../../shared/database/models');
-const ApiResponse = require('../../../shared/utils/ApiResponse');
-const { logger } = require('../../../shared/utils/logger');
-const { Op } = require('sequelize');
-const { Piece: PieceModel } = require('../../../shared/database/models');
-/**
- * Generar código automático para pieza
- * Formato: PIE-YYYY-XXX
- */
+const { catchAsync, AppError } = require('@shared/utils/app.error');
+const { executeQuery } = require('@shared/database/database');
+const ApiResponse = require('@shared/utils/ApiResponse');
+
 const generatePieceCode = async (req, res, next) => {
   try {
-    const currentYear = new Date().getFullYear();
-    const prefix = `PIE-${currentYear}-`;
-
-    const existingCodes = await PieceModel.findAll({
-      attributes: ['code'],
-      where: { code: { [Op.like]: `${prefix}%` } },
-      raw: true,
-    });
-
-    const existingNumbers = existingCodes
-      .map((p) => {
-        const match = (p.code || '').match(/PIE-\d{4}-(\d+)/);
-        return match ? parseInt(match[1], 10) : 0;
-      })
-      .filter((n) => n > 0);
-
-    let nextNumber = 1;
-    while (existingNumbers.includes(nextNumber)) nextNumber++;
-
-    const formatted = String(nextNumber).padStart(3, '0');
-    const code = `${prefix}${formatted}`;
-    return res.json(ApiResponse.success({ code }, 'Código de pieza generado'));
+    const query = `
+      SELECT CONCAT('PIEZ-', YEAR(GETDATE()), '-', 
+        RIGHT('000' + CAST(ISNULL(MAX(CAST(RIGHT(code, 3) AS INT)), 0) + 1 AS VARCHAR), 3)
+      ) AS code
+      FROM pieces 
+      WHERE code LIKE CONCAT('PIEZ-', YEAR(GETDATE()), '-%')
+    `;
+    
+    const result = await executeQuery(query);
+    const code = result.recordset[0]?.code || `PIEZ-${new Date().getFullYear()}-001`;
+    
+    res.json(ApiResponse.success({ code }, 'Código generado exitosamente'));
   } catch (error) {
-    logger.error('Error generating piece code:', error);
     next(error);
   }
 };
 
-/**
- * Obtener todas las piezas
- */
 const getPieces = async (req, res, next) => {
   try {
-    const {
-      page = 1,
-      limit = 12,
-      search = '',
-      category = '',
-      family_id = '',
-      sort_by = 'created_at',
-      sort_order = 'desc'
+    const { 
+      search, 
+      family_id, 
+      zone_id, 
+      page = 1, 
+      limit = 20,
+      is_active = true
     } = req.query;
 
-    const offset = (page - 1) * limit;
-    const whereClause = {
-      is_active: true
-    };
+    let query = `
+      SELECT 
+        p.*,
+        pf.name as family_name,
+        u.name as unit_name,
+        u.code as unit_code,
+        z.name as production_zone_name,
+        (
+          SELECT COUNT(DISTINCT pp.zone_id) 
+          FROM piece_prices pp 
+          WHERE pp.piece_id = p.id
+        ) as zones_with_price
+      FROM pieces p
+      LEFT JOIN piece_families pf ON p.family_id = pf.id
+      LEFT JOIN units_of_measure u ON p.unit_id = u.id
+      LEFT JOIN zones z ON p.production_zone_id = z.id
+      WHERE 1=1
+    `;
 
-    // Filtros
+    const params = {};
+
     if (search) {
-      whereClause[Op.or] = [
-        { name: { [Op.like]: `%${search}%` } },
-        { code: { [Op.like]: `%${search}%` } },
-        { description: { [Op.like]: `%${search}%` } }
-      ];
+      query += ` AND (p.name LIKE @search OR p.code LIKE @search OR p.description LIKE @search)`;
+      params.search = `%${search}%`;
     }
-    if (category) whereClause.category = category;
-    if (family_id) whereClause.family_id = family_id;
 
-    const { count, rows: pieces } = await Piece.findAndCountAll({
-      where: whereClause,
-      include: [
-        {
-          model: PiecePrice,
-          as: 'prices',
-          required: false,
-          paranoid: false,
-          include: [
-            {
-              model: Zone,
-              as: 'zone',
-              attributes: ['id', 'name'],
-              required: false
-            }
-          ]
-        }
-      ],
-      limit: parseInt(limit),
-      offset: offset,
-      order: [[sort_by, sort_order.toUpperCase()]],
-      distinct: true
-    });
+    if (family_id) {
+      query += ` AND p.family_id = @family_id`;
+      params.family_id = parseInt(family_id);
+    }
 
-    const totalPages = Math.ceil(count / limit);
+    if (is_active !== undefined) {
+      query += ` AND p.is_active = @is_active`;
+      params.is_active = is_active === 'true' || is_active === true ? 1 : 0;
+    }
 
-    const responseData = {
-      pieces,
-      pagination: {
-        currentPage: parseInt(page),
-        totalPages,
-        totalItems: count,
-        limit: parseInt(limit)
-      }
-    };
+    // Agregar precio si se especifica zona
+    if (zone_id) {
+      query = `
+        WITH PiecesWithPrice AS (
+          ${query}
+        )
+        SELECT 
+          pwp.*,
+          pp.base_price,
+          pp.adjustment,
+          pp.final_price,
+          pp.effective_date as price_date
+        FROM PiecesWithPrice pwp
+        LEFT JOIN piece_prices pp ON pwp.id = pp.piece_id 
+          AND pp.zone_id = @zone_id
+          AND pp.effective_date = (
+            SELECT MAX(pp2.effective_date)
+            FROM piece_prices pp2
+            WHERE pp2.piece_id = pwp.id 
+              AND pp2.zone_id = @zone_id
+              AND pp2.effective_date <= GETDATE()
+          )
+      `;
+      params.zone_id = parseInt(zone_id);
+    }
 
-    return res.json(
-      ApiResponse.success(responseData, 'Piezas obtenidas exitosamente')
-    );
+    query += ` ORDER BY p.created_at DESC`;
+
+    // Paginación
+    const offset = (page - 1) * limit;
+    query += ` OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY`;
+    params.offset = offset;
+    params.limit = parseInt(limit);
+
+    const result = await executeQuery(query, params);
+
+    // Count total
+    let countQuery = `SELECT COUNT(*) as total FROM pieces p WHERE 1=1`;
+    const countParams = {};
+    
+    if (search) {
+      countQuery += ` AND (p.name LIKE @search OR p.code LIKE @search)`;
+      countParams.search = `%${search}%`;
+    }
+    
+    if (family_id) {
+      countQuery += ` AND p.family_id = @family_id`;
+      countParams.family_id = parseInt(family_id);
+    }
+    
+    if (is_active !== undefined) {
+      countQuery += ` AND p.is_active = @is_active`;
+      countParams.is_active = is_active === 'true' || is_active === true ? 1 : 0;
+    }
+
+    const countResult = await executeQuery(countQuery, countParams);
+    const total = countResult.recordset[0].total;
+
+    res.json(ApiResponse.paginated(
+      result.recordset,
+      {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total,
+        totalPages: Math.ceil(total / limit)
+      },
+      'Piezas obtenidas exitosamente'
+    ));
   } catch (error) {
-    logger.error('Error getting pieces:', error);
     next(error);
   }
 };
 
-/**
- * Obtener una pieza por ID
- */
 const getPieceById = async (req, res, next) => {
   try {
     const { id } = req.params;
-    
-    const piece = await Piece.findByPk(id, {
-      include: [
-        {
-          model: PiecePrice,
-          as: 'prices',
-          required: false,
-          paranoid: false,
-          include: [
-            {
-              model: Zone,
-              as: 'zone',
-              attributes: ['id', 'name']
-            }
-          ]
-        }
-      ]
-    });
-    
-    if (!piece) {
-      return res.status(404).json(
-        ApiResponse.error('Pieza no encontrada', 404)
-      );
+
+    const query = `
+      SELECT 
+        p.*,
+        pf.name as family_name,
+        u.name as unit_name,
+        u.code as unit_code,
+        z.name as production_zone_name,
+        (
+          SELECT 
+            pp2.zone_id,
+            z2.name as zone_name,
+            pp2.base_price,
+            pp2.adjustment,
+            pp2.final_price,
+            pp2.effective_date
+          FROM piece_prices pp2
+          JOIN zones z2 ON pp2.zone_id = z2.id
+          WHERE pp2.piece_id = p.id
+            AND pp2.effective_date = (
+              SELECT MAX(pp3.effective_date)
+              FROM piece_prices pp3
+              WHERE pp3.piece_id = pp2.piece_id 
+                AND pp3.zone_id = pp2.zone_id
+                AND pp3.effective_date <= GETDATE()
+            )
+          FOR JSON PATH
+        ) as prices
+      FROM pieces p
+      LEFT JOIN piece_families pf ON p.family_id = pf.id
+      LEFT JOIN units_of_measure u ON p.unit_id = u.id
+      LEFT JOIN zones z ON p.production_zone_id = z.id
+      WHERE p.id = @id
+    `;
+
+    const result = await executeQuery(query, { id: parseInt(id) });
+
+    if (result.recordset.length === 0) {
+      throw new AppError('Pieza no encontrada', 404);
     }
 
-    return res.json(
-      ApiResponse.success(piece, 'Pieza obtenida exitosamente')
-    );
+    const piece = result.recordset[0];
+    if (piece.prices) {
+      piece.prices = JSON.parse(piece.prices);
+    }
+
+    res.json(ApiResponse.success(piece, 'Pieza obtenida exitosamente'));
   } catch (error) {
-    logger.error('Error getting piece by id:', error);
     next(error);
   }
 };
 
-/**
- * Crear una nueva pieza
- */
 const createPiece = async (req, res, next) => {
   try {
-    const { prices, ...pieceData } = req.body;
-    
-    // Crear la pieza primero
-    const piece = await Piece.create(pieceData);
+    const { 
+      code, name, description, family_id, unit_id,
+      um, categoriaAjuste, production_zone_id,
+      length, width, height, weight, volume,
+      pesoPorUM_tn, kgAceroPorUM, volumenM3PorUM,
+      formula_coefficient, global_coefficient,
+      prices = []
+    } = req.body;
 
-    // Si hay precios, crearlos
-    if (prices && prices.length > 0) {
-      const priceData = prices.map(price => ({
-        piece_id: piece.id,
-        zone_id: price.zoneId,
-        base_price: price.price,
-        adjustment: 0
-      }));
-      
-      await PiecePrice.bulkCreate(priceData);
+    // Validaciones
+    if (!name || !family_id || !unit_id) {
+      throw new AppError('Nombre, familia y unidad son requeridos', 400);
     }
 
-    // Obtener la pieza con sus relaciones
-    const pieceWithRelations = await Piece.findByPk(piece.id, {
-      include: [
-        {
-          model: PiecePrice,
-          as: 'prices',
-          include: [
-            {
-              model: Zone,
-              as: 'zone',
-              attributes: ['id', 'name']
-            }
-          ]
-        }
-      ]
+    // Insertar pieza
+    const insertQuery = `
+      INSERT INTO pieces (
+        code, name, description, family_id, unit_id,
+        length, width, height, weight, volume,
+        formula_coefficient, global_coefficient,
+        is_active, created_at, updated_at
+      ) OUTPUT INSERTED.id
+      VALUES (
+        @code, @name, @description, @family_id, @unit_id,
+        @length, @width, @height, @weight, @volume,
+        @formula_coefficient, @global_coefficient,
+        1, GETDATE(), GETDATE()
+      )
+    `;
+
+    const result = await executeQuery(insertQuery, {
+      code: code || null,
+      name,
+      description: description || null,
+      family_id: parseInt(family_id),
+      unit_id: parseInt(unit_id),
+      length: parseFloat(length) || 0,
+      width: parseFloat(width) || 0,
+      height: parseFloat(height) || 0,
+      weight: parseFloat(weight) || 0,
+      volume: parseFloat(volume) || 0,
+      formula_coefficient: parseFloat(formula_coefficient) || 1,
+      global_coefficient: parseFloat(global_coefficient) || 2
     });
 
-    return res.status(201).json(
-      ApiResponse.success(pieceWithRelations, 'Pieza creada exitosamente')
-    );
-  } catch (error) {
-    logger.error('Error creating piece:', error);
-    next(error);
-  }
-};
+    const pieceId = result.recordset[0].id;
 
-/**
- * Actualizar una pieza
- */
-const updatePiece = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const { prices, ...updateData } = req.body;
-
-    const piece = await Piece.findByPk(id);
-    
-    if (!piece) {
-      return res.status(404).json(
-        ApiResponse.error('Pieza no encontrada', 404)
-      );
+    // Guardar campos adicionales en una tabla de extensión si existe
+    if (um || categoriaAjuste || pesoPorUM_tn || kgAceroPorUM || volumenM3PorUM || production_zone_id) {
+      const extQuery = `
+        IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'piece_technical_data')
+        BEGIN
+          INSERT INTO piece_technical_data (
+            piece_id, um, categoria_ajuste, peso_por_um_tn,
+            kg_acero_por_um, volumen_m3_por_um, production_zone_id
+          ) VALUES (
+            @piece_id, @um, @categoria_ajuste, @peso_por_um_tn,
+            @kg_acero_por_um, @volumen_m3_por_um, @production_zone_id
+          )
+        END
+      `;
+      
+      await executeQuery(extQuery, {
+        piece_id: pieceId,
+        um: um || 'UND',
+        categoria_ajuste: categoriaAjuste || 'GENERAL',
+        peso_por_um_tn: parseFloat(pesoPorUM_tn) || 0,
+        kg_acero_por_um: parseFloat(kgAceroPorUM) || 0,
+        volumen_m3_por_um: parseFloat(volumenM3PorUM) || 0,
+        production_zone_id: parseInt(production_zone_id) || null
+      });
     }
 
-    // Actualizar la pieza
-    await piece.update(updateData);
-
-    // Si hay precios, actualizar/crear precios
+    // Insertar precios si se proporcionan
     if (prices && prices.length > 0) {
-      // Eliminar precios existentes
-      await PiecePrice.destroy({ where: { piece_id: id } });
-      
-      // Crear nuevos precios
-      const priceData = prices.filter(p => p.price > 0).map(price => ({
-        piece_id: id,
-        zone_id: price.zoneId,
-        base_price: price.price,
-        adjustment: 0
-      }));
-      
-      if (priceData.length > 0) {
-        await PiecePrice.bulkCreate(priceData);
+      for (const price of prices) {
+        const priceQuery = `
+          INSERT INTO piece_prices (
+            piece_id, zone_id, base_price, adjustment, effective_date, created_at, updated_at
+          ) VALUES (
+            @piece_id, @zone_id, @base_price, 0, GETDATE(), GETDATE(), GETDATE()
+          )
+        `;
+        
+        await executeQuery(priceQuery, {
+          piece_id: pieceId,
+          zone_id: parseInt(price.zoneId),
+          base_price: parseFloat(price.price) || 0
+        });
       }
     }
 
-    // Obtener la pieza actualizada con sus relaciones
-    const updatedPiece = await Piece.findByPk(id, {
-      include: [
-        {
-          model: PiecePrice,
-          as: 'prices',
-          required: false,
-          paranoid: false,
-          include: [
-            {
-              model: Zone,
-              as: 'zone',
-              attributes: ['id', 'name']
-            }
-          ]
-        }
-      ]
-    });
-
-    return res.json(
-      ApiResponse.success(updatedPiece, 'Pieza actualizada exitosamente')
-    );
+    res.status(201).json(ApiResponse.success(
+      { id: pieceId },
+      'Pieza creada exitosamente',
+      201
+    ));
   } catch (error) {
-    logger.error('Error updating piece:', error);
     next(error);
   }
 };
 
-/**
- * Eliminar una pieza
- */
+const updatePiece = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const {
+      code, name, description, family_id, unit_id,
+      um, categoriaAjuste, production_zone_id,
+      length, width, height, weight, volume,
+      pesoPorUM_tn, kgAceroPorUM, volumenM3PorUM,
+      formula_coefficient, global_coefficient,
+      prices = []
+    } = req.body;
+
+    // Verificar que la pieza existe
+    const checkQuery = `SELECT id FROM pieces WHERE id = @id`;
+    const checkResult = await executeQuery(checkQuery, { id: parseInt(id) });
+    
+    if (checkResult.recordset.length === 0) {
+      throw new AppError('Pieza no encontrada', 404);
+    }
+
+    // Actualizar pieza
+    const updateQuery = `
+      UPDATE pieces SET
+        code = @code,
+        name = @name,
+        description = @description,
+        family_id = @family_id,
+        unit_id = @unit_id,
+        length = @length,
+        width = @width,
+        height = @height,
+        weight = @weight,
+        volume = @volume,
+        formula_coefficient = @formula_coefficient,
+        global_coefficient = @global_coefficient,
+        updated_at = GETDATE()
+      WHERE id = @id
+    `;
+
+    await executeQuery(updateQuery, {
+      id: parseInt(id),
+      code: code || null,
+      name,
+      description: description || null,
+      family_id: parseInt(family_id),
+      unit_id: parseInt(unit_id),
+      length: parseFloat(length) || 0,
+      width: parseFloat(width) || 0,
+      height: parseFloat(height) || 0,
+      weight: parseFloat(weight) || 0,
+      volume: parseFloat(volume) || 0,
+      formula_coefficient: parseFloat(formula_coefficient) || 1,
+      global_coefficient: parseFloat(global_coefficient) || 2
+    });
+
+    // Actualizar campos técnicos si la tabla existe
+    if (um || categoriaAjuste || pesoPorUM_tn || kgAceroPorUM || volumenM3PorUM || production_zone_id) {
+      const extQuery = `
+        IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'piece_technical_data')
+        BEGIN
+          IF EXISTS (SELECT * FROM piece_technical_data WHERE piece_id = @piece_id)
+            UPDATE piece_technical_data SET
+              um = @um,
+              categoria_ajuste = @categoria_ajuste,
+              peso_por_um_tn = @peso_por_um_tn,
+              kg_acero_por_um = @kg_acero_por_um,
+              volumen_m3_por_um = @volumen_m3_por_um,
+              production_zone_id = @production_zone_id
+            WHERE piece_id = @piece_id
+          ELSE
+            INSERT INTO piece_technical_data (
+              piece_id, um, categoria_ajuste, peso_por_um_tn,
+              kg_acero_por_um, volumen_m3_por_um, production_zone_id
+            ) VALUES (
+              @piece_id, @um, @categoria_ajuste, @peso_por_um_tn,
+              @kg_acero_por_um, @volumen_m3_por_um, @production_zone_id
+            )
+        END
+      `;
+      
+      await executeQuery(extQuery, {
+        piece_id: parseInt(id),
+        um: um || 'UND',
+        categoria_ajuste: categoriaAjuste || 'GENERAL',
+        peso_por_um_tn: parseFloat(pesoPorUM_tn) || 0,
+        kg_acero_por_um: parseFloat(kgAceroPorUM) || 0,
+        volumen_m3_por_um: parseFloat(volumenM3PorUM) || 0,
+        production_zone_id: parseInt(production_zone_id) || null
+      });
+    }
+
+    // Actualizar precios si se proporcionan
+    if (prices && prices.length > 0) {
+      for (const price of prices) {
+        // Verificar si ya existe un precio para esta zona
+        const checkPriceQuery = `
+          SELECT id FROM piece_prices 
+          WHERE piece_id = @piece_id AND zone_id = @zone_id
+            AND effective_date = CAST(GETDATE() AS DATE)
+        `;
+        
+        const priceCheck = await executeQuery(checkPriceQuery, {
+          piece_id: parseInt(id),
+          zone_id: parseInt(price.zoneId)
+        });
+
+        if (priceCheck.recordset.length > 0) {
+          // Actualizar precio existente
+          const updatePriceQuery = `
+            UPDATE piece_prices SET
+              base_price = @base_price,
+              updated_at = GETDATE()
+            WHERE piece_id = @piece_id AND zone_id = @zone_id
+              AND effective_date = CAST(GETDATE() AS DATE)
+          `;
+          
+          await executeQuery(updatePriceQuery, {
+            piece_id: parseInt(id),
+            zone_id: parseInt(price.zoneId),
+            base_price: parseFloat(price.price) || 0
+          });
+        } else {
+          // Insertar nuevo precio
+          const insertPriceQuery = `
+            INSERT INTO piece_prices (
+              piece_id, zone_id, base_price, adjustment, effective_date, created_at, updated_at
+            ) VALUES (
+              @piece_id, @zone_id, @base_price, 0, CAST(GETDATE() AS DATE), GETDATE(), GETDATE()
+            )
+          `;
+          
+          await executeQuery(insertPriceQuery, {
+            piece_id: parseInt(id),
+            zone_id: parseInt(price.zoneId),
+            base_price: parseFloat(price.price) || 0
+          });
+        }
+      }
+    }
+
+    res.json(ApiResponse.success(null, 'Pieza actualizada exitosamente'));
+  } catch (error) {
+    next(error);
+  }
+};
+
 const deletePiece = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const piece = await Piece.findByPk(id);
+    // Verificar que la pieza existe
+    const checkQuery = `SELECT id FROM pieces WHERE id = @id`;
+    const checkResult = await executeQuery(checkQuery, { id: parseInt(id) });
     
-    if (!piece) {
-      return res.status(404).json(
-        ApiResponse.error('Pieza no encontrada', 404)
-      );
+    if (checkResult.recordset.length === 0) {
+      throw new AppError('Pieza no encontrada', 404);
     }
 
-    await piece.destroy();
+    // Soft delete
+    const deleteQuery = `
+      UPDATE pieces 
+      SET is_active = 0, deleted_at = GETDATE(), updated_at = GETDATE()
+      WHERE id = @id
+    `;
 
-    return res.json(
-      ApiResponse.success(null, 'Pieza eliminada exitosamente')
-    );
+    await executeQuery(deleteQuery, { id: parseInt(id) });
+
+    res.json(ApiResponse.success(null, 'Pieza eliminada exitosamente'));
   } catch (error) {
-    logger.error('Error deleting piece:', error);
     next(error);
   }
 };
 
-/**
- * Obtener piezas por zona
- */
 const getPiecesByZone = async (req, res, next) => {
   try {
     const { zoneId } = req.params;
-    
-    const pieces = await Piece.findAll({
-      include: [
-        {
-          model: PiecePrice,
-          as: 'prices',
-          required: true,
-          paranoid: false,
-          where: { zone_id: zoneId },
-          include: [
-            {
-              model: Zone,
-              as: 'zone',
-              attributes: ['id', 'name']
-            }
-          ]
-        }
-      ],
-      order: [['created_at', 'DESC']]
-    });
 
-    return res.json(
-      ApiResponse.success(pieces, 'Piezas de la zona obtenidas exitosamente')
-    );
+    const query = `
+      SELECT 
+        p.*,
+        pf.name as family_name,
+        u.name as unit_name,
+        pp.base_price,
+        pp.adjustment,
+        pp.final_price,
+        pp.effective_date
+      FROM pieces p
+      LEFT JOIN piece_families pf ON p.family_id = pf.id
+      LEFT JOIN units_of_measure u ON p.unit_id = u.id
+      LEFT JOIN piece_prices pp ON p.id = pp.piece_id 
+        AND pp.zone_id = @zone_id
+        AND pp.effective_date = (
+          SELECT MAX(pp2.effective_date)
+          FROM piece_prices pp2
+          WHERE pp2.piece_id = p.id 
+            AND pp2.zone_id = @zone_id
+            AND pp2.effective_date <= GETDATE()
+        )
+      WHERE p.is_active = 1
+      ORDER BY pf.display_order, p.name
+    `;
+
+    const result = await executeQuery(query, { zone_id: parseInt(zoneId) });
+
+    res.json(ApiResponse.success(
+      result.recordset,
+      'Piezas por zona obtenidas exitosamente'
+    ));
   } catch (error) {
-    logger.error('Error getting pieces by zone:', error);
     next(error);
   }
 };
 
-/**
- * Obtener precios de una pieza
- */
 const getPiecePrices = async (req, res, next) => {
   try {
-    const { pieceId } = req.params;
-    
-    const prices = await PiecePrice.findAll({
-      where: { piece_id: pieceId },
-      paranoid: false,
-      include: [
-        {
-          model: Zone,
-          as: 'zone',
-          attributes: ['id', 'name']
-        }
-      ],
-      order: [['created_at', 'DESC']]
-    });
+    const { id } = req.params;
 
-    return res.json(
-      ApiResponse.success(prices, 'Precios de la pieza obtenidos exitosamente')
-    );
+    const query = `
+      SELECT 
+        pp.id,
+        pp.zone_id,
+        z.name as zone_name,
+        z.code as zone_code,
+        pp.base_price,
+        pp.adjustment,
+        pp.final_price,
+        pp.effective_date,
+        pp.expiry_date
+      FROM piece_prices pp
+      JOIN zones z ON pp.zone_id = z.id
+      WHERE pp.piece_id = @piece_id
+        AND pp.effective_date = (
+          SELECT MAX(pp2.effective_date)
+          FROM piece_prices pp2
+          WHERE pp2.piece_id = pp.piece_id 
+            AND pp2.zone_id = pp.zone_id
+            AND pp2.effective_date <= GETDATE()
+        )
+      ORDER BY z.display_order, z.name
+    `;
+
+    const result = await executeQuery(query, { piece_id: parseInt(id) });
+
+    res.json(ApiResponse.success(
+      result.recordset,
+      'Precios de pieza obtenidos exitosamente'
+    ));
   } catch (error) {
-    logger.error('Error getting piece prices:', error);
     next(error);
   }
 };
 
-/**
- * Actualizar precio de una pieza
- */
 const updatePiecePrice = async (req, res, next) => {
   try {
-    const { pieceId } = req.params;
-    const priceData = req.body;
+    const { id } = req.params;
+    const { zone_id, price, adjustment = 0, effective_date } = req.body;
 
-    // Buscar si ya existe un precio para esta pieza
-    let piecePrice = await PiecePrice.findOne({
-      where: { piece_id: pieceId }
+    if (!zone_id || price === undefined) {
+      throw new AppError('zone_id y price son requeridos', 400);
+    }
+
+    const effectiveDate = effective_date || new Date().toISOString().split('T')[0];
+
+    // Verificar si ya existe un precio para esa fecha
+    const checkQuery = `
+      SELECT id FROM piece_prices 
+      WHERE piece_id = @piece_id AND zone_id = @zone_id AND effective_date = @effective_date
+    `;
+
+    const checkResult = await executeQuery(checkQuery, {
+      piece_id: parseInt(id),
+      zone_id: parseInt(zone_id),
+      effective_date: effectiveDate
     });
 
-    if (piecePrice) {
-      await piecePrice.update(priceData);
+    if (checkResult.recordset.length > 0) {
+      // Actualizar precio existente
+      const updateQuery = `
+        UPDATE piece_prices 
+        SET base_price = @price, adjustment = @adjustment, updated_at = GETDATE()
+        WHERE piece_id = @piece_id AND zone_id = @zone_id AND effective_date = @effective_date
+      `;
+
+      await executeQuery(updateQuery, {
+        piece_id: parseInt(id),
+        zone_id: parseInt(zone_id),
+        price: parseFloat(price),
+        adjustment: parseFloat(adjustment),
+        effective_date: effectiveDate
+      });
     } else {
-      piecePrice = await PiecePrice.create({
-        piece_id: pieceId,
-        ...priceData
+      // Insertar nuevo precio
+      const insertQuery = `
+        INSERT INTO piece_prices (
+          piece_id, zone_id, base_price, adjustment, effective_date, created_at, updated_at
+        ) VALUES (
+          @piece_id, @zone_id, @price, @adjustment, @effective_date, GETDATE(), GETDATE()
+        )
+      `;
+
+      await executeQuery(insertQuery, {
+        piece_id: parseInt(id),
+        zone_id: parseInt(zone_id),
+        price: parseFloat(price),
+        adjustment: parseFloat(adjustment),
+        effective_date: effectiveDate
       });
     }
 
-    return res.json(
-      ApiResponse.success(piecePrice, 'Precio de la pieza actualizado exitosamente')
-    );
+    res.json(ApiResponse.success(null, 'Precio actualizado exitosamente'));
   } catch (error) {
-    logger.error('Error updating piece price:', error);
     next(error);
   }
 };
 
+/**
+ * Calcular precio por UM usando TVF de costo
+ */
+const calculatePiecePrice = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const { zone_id, as_of_date } = req.query;
+
+  if (!zone_id) {
+    throw new AppError('zone_id es requerido', 400);
+  }
+
+  const date = as_of_date || new Date().toISOString().split('T')[0];
+
+  // Usar TVF para obtener desglose de costos
+  const query = `
+    SELECT * FROM dbo.TVF_piece_cost_breakdown(@piece_id, @zone_id, @as_of_date)
+  `;
+
+  const result = await executeQuery(query, {
+    piece_id: parseInt(id),
+    zone_id: parseInt(zone_id),
+    as_of_date: date
+  });
+
+  if (result.recordset.length === 0) {
+    throw new AppError('No se pudo calcular el precio para esta pieza', 404);
+  }
+
+  const breakdown = result.recordset[0];
+
+  res.json(ApiResponse.success({
+    piece_id: parseInt(id),
+    zone_id: parseInt(zone_id),
+    as_of_date: date,
+    breakdown: {
+      materiales: parseFloat(breakdown.materiales) || 0,
+      proceso_por_tn: parseFloat(breakdown.proceso_por_tn) || 0,
+      mano_obra_hormigon: parseFloat(breakdown.mano_obra_hormigon) || 0,
+      mano_obra_acero: parseFloat(breakdown.mano_obra_acero) || 0,
+      total: parseFloat(breakdown.total) || 0
+    }
+  }, 'Precio calculado exitosamente'));
+});
+
+/**
+ * Publicar precio de pieza para un mes/zona
+ */
+const publishPiecePrice = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const { zone_id, effective_date, price } = req.body;
+
+  if (!zone_id || !effective_date) {
+    throw new AppError('zone_id y effective_date son requeridos', 400);
+  }
+
+  let finalPrice = price;
+
+  // Si no se proporciona precio, calcularlo usando TVF
+  if (!finalPrice) {
+    const calcQuery = `
+      SELECT total FROM dbo.TVF_piece_cost_breakdown(@piece_id, @zone_id, @as_of_date)
+    `;
+
+    const calcResult = await executeQuery(calcQuery, {
+      piece_id: parseInt(id),
+      zone_id: parseInt(zone_id),
+      as_of_date: effective_date
+    });
+
+    if (calcResult.recordset.length === 0) {
+      throw new AppError('No se pudo calcular el precio', 500);
+    }
+
+    finalPrice = calcResult.recordset[0].total;
+  }
+
+  // Verificar si ya existe precio publicado para esa fecha
+  const checkQuery = `
+    SELECT id FROM piece_prices 
+    WHERE piece_id = @piece_id AND zone_id = @zone_id AND effective_date = @effective_date
+  `;
+
+  const checkResult = await executeQuery(checkQuery, {
+    piece_id: parseInt(id),
+    zone_id: parseInt(zone_id),
+    effective_date: effective_date
+  });
+
+  if (checkResult.recordset.length > 0) {
+    // Actualizar precio existente
+    const updateQuery = `
+      UPDATE piece_prices 
+      SET base_price = @price, updated_at = GETDATE(), created_by = @user_id
+      WHERE piece_id = @piece_id AND zone_id = @zone_id AND effective_date = @effective_date
+    `;
+
+    await executeQuery(updateQuery, {
+      piece_id: parseInt(id),
+      zone_id: parseInt(zone_id),
+      price: parseFloat(finalPrice),
+      effective_date: effective_date,
+      user_id: req.user?.id || null
+    });
+  } else {
+    // Insertar nuevo precio
+    const insertQuery = `
+      INSERT INTO piece_prices (
+        piece_id, zone_id, base_price, adjustment, effective_date, 
+        created_by, created_at, updated_at
+      ) VALUES (
+        @piece_id, @zone_id, @price, 0, @effective_date, 
+        @user_id, GETDATE(), GETDATE()
+      )
+    `;
+
+    await executeQuery(insertQuery, {
+      piece_id: parseInt(id),
+      zone_id: parseInt(zone_id),
+      price: parseFloat(finalPrice),
+      effective_date: effective_date,
+      user_id: req.user?.id || null
+    });
+  }
+
+  res.json(ApiResponse.success({
+    piece_id: parseInt(id),
+    zone_id: parseInt(zone_id),
+    price: parseFloat(finalPrice),
+    effective_date: effective_date
+  }, 'Precio publicado exitosamente'));
+});
+
 module.exports = {
+  generatePieceCode,
   getPieces,
   getPieceById,
   createPiece,
@@ -398,5 +758,6 @@ module.exports = {
   getPiecesByZone,
   getPiecePrices,
   updatePiecePrice,
-  generatePieceCode,
+  calculatePiecePrice,
+  publishPiecePrice
 };

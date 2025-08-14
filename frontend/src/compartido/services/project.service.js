@@ -14,7 +14,7 @@ class ProjectService {
       if (params.sort_by) queryParams.append('sort_by', params.sort_by);
       if (params.sort_order) queryParams.append('sort_order', params.sort_order);
 
-      const url = queryParams.toString() ? `/projects?${queryParams.toString()}` : '/projects';
+      const url = queryParams.toString() ? `/proyectos?${queryParams.toString()}` : '/proyectos';
       const response = await api.get(url);
       return response.data;
     } catch (error) {
@@ -25,7 +25,7 @@ class ProjectService {
 
   async getProjects() {
     try {
-      const response = await api.get('/projects');
+      const response = await api.get('/proyectos');
       return response.data;
     } catch (error) {
       console.error('Error fetching projects:', error);
@@ -35,7 +35,7 @@ class ProjectService {
 
   async getProject(id) {
     try {
-      const response = await api.get(`/projects/${id}`);
+      const response = await api.get(`/proyectos/${id}`);
       return response.data;
     } catch (error) {
       console.error('Error fetching project:', error);
@@ -55,7 +55,7 @@ class ProjectService {
 
   async createProject(projectData) {
     try {
-      const response = await api.post('/projects', projectData);
+      const response = await api.post('/proyectos', projectData);
       return response.data;
     } catch (error) {
       console.error('Error creating project:', error);
@@ -65,7 +65,7 @@ class ProjectService {
 
   async updateProject(id, projectData) {
     try {
-      const response = await api.put(`/projects/${id}`, projectData);
+      const response = await api.put(`/proyectos/${id}`, projectData);
       return response.data;
     } catch (error) {
       console.error('Error updating project:', error);
@@ -75,7 +75,7 @@ class ProjectService {
 
   async deleteProject(id) {
     try {
-      const response = await api.delete(`/projects/${id}`);
+      const response = await api.delete(`/proyectos/${id}`);
       return response.data;
     } catch (error) {
       console.error('Error deleting project:', error);
@@ -85,7 +85,7 @@ class ProjectService {
 
   async getProjectsByCustomer(customerId) {
     try {
-      const response = await api.get(`/projects/customer/${customerId}`);
+      const response = await api.get(`/proyectos/customer/${customerId}`);
       return response.data;
     } catch (error) {
       console.error('Error fetching projects by customer:', error);

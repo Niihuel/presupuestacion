@@ -15,7 +15,7 @@ const { errorHandler } = require('../shared/middleware/error.handler');
 // Import routes from modules
 const { authRoutes, quotationRoutes, zoneRoutes, customerRoutes, projectRoutes, pieceRoutes, dashboardRoutes, systemRoutes, materialRoutes, adminRoutes } = require('../modules');
 
-// Import individual routes
+// Import individual routes (temporal)
 const calculistaRoutes = require('../routes/calculista.routes');
 
 // Import passport strategies  
@@ -177,15 +177,15 @@ app.get('/api/v1/test', (req, res) => {
 
 // API routes - Nueva estructura modular
 app.use('/api/v1/auth', authRoutes);
-app.use('/api/v1/quotations', quotationRoutes);
-app.use('/api/v1/zones', zoneRoutes);
-app.use('/api/v1/customers', customerRoutes);
-app.use('/api/v1/projects', projectRoutes);
-app.use('/api/v1/pieces', pieceRoutes);
+app.use('/api/v1/presupuestos', quotationRoutes);
+app.use('/api/v1/zonas', zoneRoutes);
+app.use('/api/v1/clientes', customerRoutes);
+app.use('/api/v1/proyectos', projectRoutes);
+app.use('/api/v1/piezas', pieceRoutes);
 app.use('/api/v1/dashboard', dashboardRoutes);
 app.use('/api/v1/calculistas', calculistaRoutes);
-app.use('/api/v1/materials', materialRoutes);
-app.use('/api/v1', systemRoutes);
+app.use('/api/v1/materiales', materialRoutes);
+app.use('/api/v1/sistema', systemRoutes);
 app.use('/api/v1/admin', adminRoutes);
 
 // Ruta temporal para testing de clientes

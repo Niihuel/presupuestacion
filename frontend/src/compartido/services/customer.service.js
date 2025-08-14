@@ -16,7 +16,7 @@ const getCustomers = async (filters = {}) => {
     }
 
     const queryString = params.toString();
-    const url = `/customers${queryString ? `?${queryString}` : ''}`;
+    const url = `/clientes${queryString ? `?${queryString}` : ''}`};
     
     const response = await api.get(url);
     // Devolver toda la estructura de datos incluida la paginación

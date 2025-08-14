@@ -27,7 +27,7 @@ class ZoneService {
         }
       });
 
-      const response = await api.get(`/zones?${params}`);
+      const response = await api.get(`/zonas?${params}`);
       return response.data;
     } catch (error) {
       console.error('Error fetching zones:', error);
@@ -40,7 +40,7 @@ class ZoneService {
    */
   async getZone(id) {
     try {
-      const response = await api.get(`/zones/${id}`);
+      const response = await api.get(`/zonas/${id}`);
       return response.data;
     } catch (error) {
       console.error('Error fetching zone:', error);
@@ -53,7 +53,7 @@ class ZoneService {
    */
   async createZone(zoneData) {
     try {
-      const response = await api.post('/zones', zoneData);
+      const response = await api.post('/zonas', zoneData);
       return response.data;
     } catch (error) {
       console.error('Error creating zone:', error);
@@ -66,7 +66,7 @@ class ZoneService {
    */
   async updateZone(id, zoneData) {
     try {
-      const response = await api.put(`/zones/${id}`, zoneData);
+      const response = await api.put(`/zonas/${id}`, zoneData);
       return response.data;
     } catch (error) {
       console.error('Error updating zone:', error);
@@ -79,7 +79,7 @@ class ZoneService {
    */
   async deleteZone(id) {
     try {
-      const response = await api.delete(`/zones/${id}`);
+      const response = await api.delete(`/zonas/${id}`);
       return response.data;
     } catch (error) {
       console.error('Error deleting zone:', error);
@@ -95,7 +95,7 @@ class ZoneService {
   async getZonePrices(zoneId, filters = {}) {
     try {
       const params = new URLSearchParams(filters);
-      const response = await api.get(`/zones/${zoneId}/prices?${params}`);
+      const response = await api.get(`/zonas/${zoneId}/prices?${params}`);
       return response.data;
     } catch (error) {
       console.error('Error fetching zone prices:', error);
@@ -108,7 +108,7 @@ class ZoneService {
    */
   async updatePiecePrice(zoneId, pieceId, priceData) {
     try {
-      const response = await api.put(`/zones/${zoneId}/prices/${pieceId}`, priceData);
+      const response = await api.put(`/zonas/${zoneId}/prices/${pieceId}`, priceData);
       return response.data;
     } catch (error) {
       console.error('Error updating piece price:', error);
@@ -121,7 +121,7 @@ class ZoneService {
    */
   async updateMultiplePrices(zoneId, pricesData) {
     try {
-      const response = await api.put(`/zones/${zoneId}/prices/bulk`, {
+      const response = await api.put(`/zonas/${zoneId}/prices/bulk`, {
         prices: pricesData
       });
       return response.data;
@@ -136,7 +136,7 @@ class ZoneService {
    */
   async copyPricesBetweenZones(sourceZoneId, targetZoneId, options = {}) {
     try {
-      const response = await api.post(`/zones/${sourceZoneId}/copy-prices`, {
+      const response = await api.post(`/zonas/${sourceZoneId}/copy-prices`, {
         target_zone_id: targetZoneId,
         ...options
       });
@@ -152,7 +152,7 @@ class ZoneService {
    */
   async applyPriceAdjustment(zoneId, adjustmentData) {
     try {
-      const response = await api.post(`/zones/${zoneId}/adjust-prices`, adjustmentData);
+      const response = await api.post(`/zonas/${zoneId}/adjust-prices`, adjustmentData);
       return response.data;
     } catch (error) {
       console.error('Error applying price adjustment:', error);
@@ -167,7 +167,7 @@ class ZoneService {
    */
   async getZonesStats(period = '30d') {
     try {
-      const response = await api.get(`/zones/stats?period=${period}`);
+      const response = await api.get(`/zonas/stats?period=${period}`);
       return response.data;
     } catch (error) {
       console.error('Error fetching zones stats:', error);
@@ -180,7 +180,7 @@ class ZoneService {
    */
   async getZoneMetrics(zoneId, period = '30d') {
     try {
-      const response = await api.get(`/zones/${zoneId}/metrics?period=${period}`);
+      const response = await api.get(`/zonas/${zoneId}/metrics?period=${period}`);
       return response.data;
     } catch (error) {
       console.error('Error fetching zone metrics:', error);
@@ -193,7 +193,7 @@ class ZoneService {
    */
   async getZonesComparison(zoneIds, period = '30d') {
     try {
-      const response = await api.post('/zones/compare', {
+      const response = await api.post('/zonas/compare', {
         zone_ids: zoneIds,
         period
       });
@@ -209,7 +209,7 @@ class ZoneService {
    */
   async getPriceTrends(zoneId, period = '90d') {
     try {
-      const response = await api.get(`/zones/${zoneId}/price-trends?period=${period}`);
+      const response = await api.get(`/zonas/${zoneId}/price-trends?period=${period}`);
       return response.data;
     } catch (error) {
       console.error('Error fetching price trends:', error);

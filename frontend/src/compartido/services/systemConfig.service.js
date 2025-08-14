@@ -13,7 +13,7 @@ class SystemConfigService {
    */
   async getSystemConfig() {
     try {
-      const response = await api.get('/api/v1/system/config');
+      const response = await api.get('/api/v1/sistema/config');
       return response.data;
     } catch (error) {
       console.error('Error fetching system config:', error);
@@ -26,7 +26,7 @@ class SystemConfigService {
    */
   async getSystemConfigSection(section) {
     try {
-      const response = await api.get(`/api/v1/system/config/${section}`);
+      const response = await api.get(`/api/v1/sistema/config/${section}`);
       return response.data;
     } catch (error) {
       console.error(`Error fetching system config section ${section}:`, error);
@@ -39,7 +39,7 @@ class SystemConfigService {
    */
   async updateSystemConfig(configData) {
     try {
-      const response = await api.put('/api/v1/system/config', configData);
+      const response = await api.put('/api/v1/sistema/config', configData);
       return response.data;
     } catch (error) {
       console.error('Error updating system config:', error);
@@ -52,7 +52,7 @@ class SystemConfigService {
    */
   async updateSystemConfigSection(section, data) {
     try {
-      const response = await api.put(`/api/v1/system/config/${section}`, data);
+      const response = await api.put(`/api/v1/sistema/config/${section}`, data);
       return response.data;
     } catch (error) {
       console.error(`Error updating system config section ${section}:`, error);
@@ -66,8 +66,8 @@ class SystemConfigService {
   async resetSystemConfig(section = null) {
     try {
       const url = section 
-        ? `/api/v1/system/config/${section}/reset`
-        : '/api/v1/system/config/reset';
+        ? `/api/v1/sistema/config/${section}/reset`
+        : '/api/v1/sistema/config/reset';
       
       const response = await api.post(url);
       return response.data;
@@ -82,7 +82,7 @@ class SystemConfigService {
    */
   async exportSystemConfig() {
     try {
-      const response = await api.get('/api/v1/system/config/export');
+      const response = await api.get('/api/v1/sistema/config/export');
       return response.data;
     } catch (error) {
       console.error('Error exporting system config:', error);
@@ -98,7 +98,7 @@ class SystemConfigService {
       const formData = new FormData();
       formData.append('config', configFile);
       
-      const response = await api.post('/api/v1/system/config/import', formData, {
+      const response = await api.post('/api/v1/sistema/config/import', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -115,7 +115,7 @@ class SystemConfigService {
    */
   async validateSystemConfig() {
     try {
-      const response = await api.post('/api/v1/system/config/validate');
+      const response = await api.post('/api/v1/sistema/config/validate');
       return response.data;
     } catch (error) {
       console.error('Error validating system config:', error);
@@ -128,7 +128,7 @@ class SystemConfigService {
    */
   async getDefaultConfigs() {
     try {
-      const response = await api.get('/api/v1/system/config/defaults');
+      const response = await api.get('/api/v1/sistema/config/defaults');
       return response.data;
     } catch (error) {
       console.error('Error fetching default configs:', error);
@@ -141,7 +141,7 @@ class SystemConfigService {
    */
   async getConfigHistory(limit = 20) {
     try {
-      const response = await api.get('/api/v1/system/config/history', {
+      const response = await api.get('/api/v1/sistema/config/history', {
         params: { limit }
       });
       return response.data;
@@ -156,7 +156,7 @@ class SystemConfigService {
    */
   async applyConfigFromHistory(historyId) {
     try {
-      const response = await api.post(`/api/v1/system/config/history/${historyId}/apply`);
+      const response = await api.post(`/api/v1/sistema/config/history/${historyId}/apply`);
       return response.data;
     } catch (error) {
       console.error('Error applying config from history:', error);

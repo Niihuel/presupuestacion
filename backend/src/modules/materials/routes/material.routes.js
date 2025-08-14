@@ -617,4 +617,76 @@ router.post('/prices/close-month',
   }
 );
 
+// ==============================
+// WHERE USED Y ANÁLISIS DE IMPACTO
+// ==============================
+
+/**
+ * GET /api/materials/:id/where-used
+ * Obtener piezas que utilizan este material (BOM / Factor fundamental)
+ */
+router.get('/:id/where-used',
+  validateMaterialId,
+  [
+    query('zone_id').isInt({ min: 1 }).withMessage('zone_id es requerido'),
+    query('month_date').optional().isISO8601().withMessage('month_date debe ser una fecha válida')
+  ],
+  validateRequest,
+  materialController.getWhereUsed
+);
+
+/**
+ * POST /api/materials/recalculate-impact
+ * Recalcular impacto de cambios de precio en piezas
+ */
+router.post('/recalculate-impact',
+  [
+    body('material_id').isInt({ min: 1 }).withMessage('material_id es requerido'),
+    body('zone_id').isInt({ min: 1 }).withMessage('zone_id es requerido'),
+    body('month_date').optional().isISO8601().withMessage('month_date debe ser una fecha válida')
+  ],
+  validateRequest,
+  materialController.recalculateImpact
+);
+
+/**
+ * POST /api/materials/import-csv
+ * Importar precios de materiales desde CSV
+ */
+router.post('/import-csv',
+  [
+    body('zone_id').isInt({ min: 1 }).withMessage('zone_id es requerido'),
+    body('month_date').isISO8601().withMessage('month_date es requerido'),
+    body('data').isArray().withMessage('data debe ser un array de registros CSV')
+  ],
+  validateRequest,
+  materialController.importFromCSV
+);
+
+/**
+ * GET /api/materials/export-csv
+ * Exportar precios de materiales a CSV
+ */
+router.get('/export-csv',
+  [
+    query('zone_id').isInt({ min: 1 }).withMessage('zone_id es requerido'),
+    query('month_date').optional().isISO8601().withMessage('month_date debe ser una fecha válida')
+  ],
+  validateRequest,
+  materialController.exportToCSV
+);
+
+/**
+ * POST /api/materials/close-month
+ * Cerrar mes para precios de materiales (mejorado)
+ */
+router.post('/close-month',
+  [
+    body('zone_id').isInt({ min: 1 }).withMessage('zone_id es requerido'),
+    body('month_date').isISO8601().withMessage('month_date es requerido')
+  ],
+  validateRequest,
+  materialController.closeMonth
+);
+
 module.exports = router;

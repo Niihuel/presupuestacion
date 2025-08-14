@@ -23,6 +23,7 @@ router.get('/:id/prices', pieceController.getPiecePrices);
 router.put('/:id/prices', pieceController.updatePiecePrice);
 router.get('/:id/calculate-price', pieceController.calculatePiecePrice);
 router.post('/:id/publish-price', pieceController.publishPiecePrice);
+router.get('/:id/history', pieceController.getPieceHistory);
 
 // Por zona
 router.get('/zone/:zoneId', pieceController.getPiecesByZone);

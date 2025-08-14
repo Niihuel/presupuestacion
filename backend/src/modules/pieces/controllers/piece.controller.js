@@ -149,6 +149,10 @@ const getPieceById = async (req, res, next) => {
     const query = `
       SELECT 
         p.*,
+        p.kg_acero_por_um,
+        p.volumen_m3_por_um,
+        p.peso_tn_por_um,
+        p.categoria_ajuste,
         pf.name as family_name,
         u.name as unit_name,
         u.code as unit_code,
@@ -172,7 +176,19 @@ const getPieceById = async (req, res, next) => {
                 AND pp3.effective_date <= GETDATE()
             )
           FOR JSON PATH
-        ) as prices
+        ) as prices,
+        (
+          SELECT 
+            pmf.material_id,
+            m.code as material_code,
+            m.name as material_name,
+            pmf.quantity_per_unit,
+            pmf.waste_factor
+          FROM piece_material_formulas pmf
+          JOIN materials m ON pmf.material_id = m.id
+          WHERE pmf.piece_id = p.id
+          FOR JSON PATH
+        ) as bom
       FROM pieces p
       LEFT JOIN piece_families pf ON p.family_id = pf.id
       LEFT JOIN units_of_measure u ON p.unit_id = u.id
@@ -189,6 +205,9 @@ const getPieceById = async (req, res, next) => {
     const piece = result.recordset[0];
     if (piece.prices) {
       piece.prices = JSON.parse(piece.prices);
+    }
+    if (piece.bom) {
+      piece.bom = JSON.parse(piece.bom);
     }
 
     res.json(ApiResponse.success(piece, 'Pieza obtenida exitosamente'));
@@ -213,18 +232,22 @@ const createPiece = async (req, res, next) => {
       throw new AppError('Nombre, familia y unidad son requeridos', 400);
     }
 
-    // Insertar pieza
+    // Insertar pieza con nuevos campos técnicos
     const insertQuery = `
       INSERT INTO pieces (
         code, name, description, family_id, unit_id,
         length, width, height, weight, volume,
         formula_coefficient, global_coefficient,
+        production_zone_id, categoria_ajuste,
+        kg_acero_por_um, volumen_m3_por_um, peso_tn_por_um,
         is_active, created_at, updated_at
       ) OUTPUT INSERTED.id
       VALUES (
         @code, @name, @description, @family_id, @unit_id,
         @length, @width, @height, @weight, @volume,
         @formula_coefficient, @global_coefficient,
+        @production_zone_id, @categoria_ajuste,
+        @kg_acero_por_um, @volumen_m3_por_um, @peso_tn_por_um,
         1, GETDATE(), GETDATE()
       )
     `;
@@ -241,36 +264,15 @@ const createPiece = async (req, res, next) => {
       weight: parseFloat(weight) || 0,
       volume: parseFloat(volume) || 0,
       formula_coefficient: parseFloat(formula_coefficient) || 1,
-      global_coefficient: parseFloat(global_coefficient) || 2
+      global_coefficient: parseFloat(global_coefficient) || 2,
+      production_zone_id: production_zone_id ? parseInt(production_zone_id) : null,
+      categoria_ajuste: categoriaAjuste || null,
+      kg_acero_por_um: parseFloat(kgAceroPorUM) || 0,
+      volumen_m3_por_um: parseFloat(volumenM3PorUM) || 0,
+      peso_tn_por_um: parseFloat(pesoPorUM_tn) || null
     });
 
     const pieceId = result.recordset[0].id;
-
-    // Guardar campos adicionales en una tabla de extensión si existe
-    if (um || categoriaAjuste || pesoPorUM_tn || kgAceroPorUM || volumenM3PorUM || production_zone_id) {
-      const extQuery = `
-        IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'piece_technical_data')
-        BEGIN
-          INSERT INTO piece_technical_data (
-            piece_id, um, categoria_ajuste, peso_por_um_tn,
-            kg_acero_por_um, volumen_m3_por_um, production_zone_id
-          ) VALUES (
-            @piece_id, @um, @categoria_ajuste, @peso_por_um_tn,
-            @kg_acero_por_um, @volumen_m3_por_um, @production_zone_id
-          )
-        END
-      `;
-      
-      await executeQuery(extQuery, {
-        piece_id: pieceId,
-        um: um || 'UND',
-        categoria_ajuste: categoriaAjuste || 'GENERAL',
-        peso_por_um_tn: parseFloat(pesoPorUM_tn) || 0,
-        kg_acero_por_um: parseFloat(kgAceroPorUM) || 0,
-        volumen_m3_por_um: parseFloat(volumenM3PorUM) || 0,
-        production_zone_id: parseInt(production_zone_id) || null
-      });
-    }
 
     // Insertar precios si se proporcionan
     if (prices && prices.length > 0) {
@@ -321,7 +323,7 @@ const updatePiece = async (req, res, next) => {
       throw new AppError('Pieza no encontrada', 404);
     }
 
-    // Actualizar pieza
+    // Actualizar pieza con nuevos campos técnicos
     const updateQuery = `
       UPDATE pieces SET
         code = @code,
@@ -336,6 +338,11 @@ const updatePiece = async (req, res, next) => {
         volume = @volume,
         formula_coefficient = @formula_coefficient,
         global_coefficient = @global_coefficient,
+        production_zone_id = @production_zone_id,
+        categoria_ajuste = @categoria_ajuste,
+        kg_acero_por_um = @kg_acero_por_um,
+        volumen_m3_por_um = @volumen_m3_por_um,
+        peso_tn_por_um = @peso_tn_por_um,
         updated_at = GETDATE()
       WHERE id = @id
     `;
@@ -353,44 +360,13 @@ const updatePiece = async (req, res, next) => {
       weight: parseFloat(weight) || 0,
       volume: parseFloat(volume) || 0,
       formula_coefficient: parseFloat(formula_coefficient) || 1,
-      global_coefficient: parseFloat(global_coefficient) || 2
+      global_coefficient: parseFloat(global_coefficient) || 2,
+      production_zone_id: production_zone_id ? parseInt(production_zone_id) : null,
+      categoria_ajuste: categoriaAjuste || null,
+      kg_acero_por_um: parseFloat(kgAceroPorUM) || 0,
+      volumen_m3_por_um: parseFloat(volumenM3PorUM) || 0,
+      peso_tn_por_um: parseFloat(pesoPorUM_tn) || null
     });
-
-    // Actualizar campos técnicos si la tabla existe
-    if (um || categoriaAjuste || pesoPorUM_tn || kgAceroPorUM || volumenM3PorUM || production_zone_id) {
-      const extQuery = `
-        IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'piece_technical_data')
-        BEGIN
-          IF EXISTS (SELECT * FROM piece_technical_data WHERE piece_id = @piece_id)
-            UPDATE piece_technical_data SET
-              um = @um,
-              categoria_ajuste = @categoria_ajuste,
-              peso_por_um_tn = @peso_por_um_tn,
-              kg_acero_por_um = @kg_acero_por_um,
-              volumen_m3_por_um = @volumen_m3_por_um,
-              production_zone_id = @production_zone_id
-            WHERE piece_id = @piece_id
-          ELSE
-            INSERT INTO piece_technical_data (
-              piece_id, um, categoria_ajuste, peso_por_um_tn,
-              kg_acero_por_um, volumen_m3_por_um, production_zone_id
-            ) VALUES (
-              @piece_id, @um, @categoria_ajuste, @peso_por_um_tn,
-              @kg_acero_por_um, @volumen_m3_por_um, @production_zone_id
-            )
-        END
-      `;
-      
-      await executeQuery(extQuery, {
-        piece_id: parseInt(id),
-        um: um || 'UND',
-        categoria_ajuste: categoriaAjuste || 'GENERAL',
-        peso_por_um_tn: parseFloat(pesoPorUM_tn) || 0,
-        kg_acero_por_um: parseFloat(kgAceroPorUM) || 0,
-        volumen_m3_por_um: parseFloat(volumenM3PorUM) || 0,
-        production_zone_id: parseInt(production_zone_id) || null
-      });
-    }
 
     // Actualizar precios si se proporcionan
     if (prices && prices.length > 0) {
@@ -617,11 +593,12 @@ const updatePiecePrice = async (req, res, next) => {
 };
 
 /**
- * Calcular precio por UM usando TVF de costo
+ * Calcular precio por UM usando TVF de costo v2
+ * GET /api/pieces/:pieceId/price?zoneId=&asOf=&um=&compare=&publish=
  */
 const calculatePiecePrice = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const { zone_id, as_of_date } = req.query;
+  const { zone_id, as_of_date, compare, publish } = req.query;
 
   if (!zone_id) {
     throw new AppError('zone_id es requerido', 400);
@@ -629,7 +606,7 @@ const calculatePiecePrice = catchAsync(async (req, res) => {
 
   const date = as_of_date || new Date().toISOString().split('T')[0];
 
-  // Usar TVF para obtener desglose de costos
+  // Usar TVF v2 para obtener desglose completo de costos
   const query = `
     SELECT * FROM dbo.TVF_piece_cost_breakdown(@piece_id, @zone_id, @as_of_date)
   `;
@@ -645,19 +622,161 @@ const calculatePiecePrice = catchAsync(async (req, res) => {
   }
 
   const breakdown = result.recordset[0];
+  
+  // Obtener información de la pieza para validaciones
+  const pieceQuery = `
+    SELECT 
+      p.id, p.name, p.code, 
+      p.kg_acero_por_um, p.volumen_m3_por_um, p.peso_tn_por_um,
+      um.code as unit_code, um.name as unit_name
+    FROM pieces p
+    INNER JOIN units_of_measure um ON p.unit_id = um.id
+    WHERE p.id = @piece_id
+  `;
+  
+  const pieceResult = await executeQuery(pieceQuery, {
+    piece_id: parseInt(id)
+  });
+  
+  const pieceData = pieceResult.recordset[0];
 
-  res.json(ApiResponse.success({
+  // Warnings para datos faltantes
+  const warnings = [];
+  const missingPrices = [];
+  
+  if (breakdown.missing_geom === 1) {
+    warnings.push('Faltan datos geométricos para el cálculo completo (kg_acero, m³_hormigón o peso_tn por UM)');
+  }
+  
+  if (breakdown.missing_process_params === 1) {
+    warnings.push('No hay parámetros de proceso configurados para esta zona/mes');
+  }
+
+  // Verificar materiales sin precio
+  const materialsQuery = `
+    SELECT DISTINCT m.code, m.name
+    FROM piece_material_formulas pmf
+    INNER JOIN materials m ON pmf.material_id = m.id
+    LEFT JOIN material_plant_prices mpp ON m.id = mpp.material_id 
+      AND mpp.zone_id = @zone_id 
+      AND mpp.is_active = 1
+      AND mpp.valid_from <= @as_of_date
+      AND (mpp.valid_until IS NULL OR mpp.valid_until >= @as_of_date)
+    WHERE pmf.piece_id = @piece_id AND mpp.id IS NULL
+  `;
+  
+  const missingMaterialsResult = await executeQuery(materialsQuery, {
     piece_id: parseInt(id),
     zone_id: parseInt(zone_id),
+    as_of_date: date
+  });
+  
+  if (missingMaterialsResult.recordset.length > 0) {
+    missingPrices.push(...missingMaterialsResult.recordset.map(m => ({
+      type: 'material',
+      code: m.code,
+      name: m.name
+    })));
+    warnings.push(`Faltan precios para ${missingMaterialsResult.recordset.length} material(es)`);
+  }
+
+  // Preparar respuesta base
+  const response = {
+    piece_id: parseInt(id),
+    piece_code: pieceData.code,
+    piece_name: pieceData.name,
+    zone_id: parseInt(zone_id),
     as_of_date: date,
+    unit: {
+      code: pieceData.unit_code,
+      name: pieceData.unit_name
+    },
     breakdown: {
       materiales: parseFloat(breakdown.materiales) || 0,
       proceso_por_tn: parseFloat(breakdown.proceso_por_tn) || 0,
       mano_obra_hormigon: parseFloat(breakdown.mano_obra_hormigon) || 0,
       mano_obra_acero: parseFloat(breakdown.mano_obra_acero) || 0,
       total: parseFloat(breakdown.total) || 0
+    },
+    technical_data: {
+      kg_acero_por_um: parseFloat(pieceData.kg_acero_por_um) || 0,
+      volumen_m3_por_um: parseFloat(pieceData.volumen_m3_por_um) || 0,
+      peso_tn_por_um: parseFloat(pieceData.peso_tn_por_um) || 0
+    },
+    warnings: warnings.length > 0 ? warnings : undefined,
+    missing_prices: missingPrices.length > 0 ? missingPrices : undefined
+  };
+
+  // Si compare=true, calcular comparación con mes anterior
+  if (compare === 'true') {
+    const previousMonth = new Date(date);
+    previousMonth.setMonth(previousMonth.getMonth() - 1);
+    const previousDate = previousMonth.toISOString().split('T')[0];
+    
+    // Obtener precio del mes anterior usando función helper
+    const previousPriceQuery = `
+      SELECT dbo.FN_get_piece_price_previous_month(@piece_id, @zone_id, @current_date) as previous_price
+    `;
+    
+    const previousResult = await executeQuery(previousPriceQuery, {
+      piece_id: parseInt(id),
+      zone_id: parseInt(zone_id),
+      current_date: date
+    });
+    
+    const previousPrice = previousResult.recordset[0]?.previous_price || 0;
+    
+    if (previousPrice > 0) {
+      const currentPrice = parseFloat(breakdown.total);
+      const delta = currentPrice - previousPrice;
+      const deltaPercent = (delta / previousPrice) * 100;
+      
+      response.comparison = {
+        previous_month_date: previousDate,
+        previous_price: previousPrice,
+        current_price: currentPrice,
+        delta: delta,
+        delta_percent: deltaPercent,
+        factor: currentPrice / previousPrice,
+        trend: delta > 0 ? 'up' : delta < 0 ? 'down' : 'equal'
+      };
     }
-  }, 'Precio calculado exitosamente'));
+  }
+
+  // Si publish=true, publicar el precio
+  if (publish === 'true') {
+    // No publicar si faltan datos críticos
+    if (missingPrices.length > 0) {
+      throw new AppError('No se puede publicar el precio: faltan precios de materiales', 400);
+    }
+    
+    const publishQuery = `
+      DECLARE @price_id INT;
+      EXEC dbo.SP_publish_piece_price 
+        @piece_id = @piece_id,
+        @zone_id = @zone_id,
+        @effective_date = @effective_date,
+        @price_per_unit = @price,
+        @created_by = @user_id,
+        @price_id = @price_id OUTPUT;
+      SELECT @price_id as price_id;
+    `;
+    
+    const publishResult = await executeQuery(publishQuery, {
+      piece_id: parseInt(id),
+      zone_id: parseInt(zone_id),
+      effective_date: date,
+      price: parseFloat(breakdown.total),
+      user_id: req.user?.id || 1
+    });
+    
+    response.published = {
+      price_id: publishResult.recordset[0].price_id,
+      message: 'Precio publicado exitosamente'
+    };
+  }
+
+  res.json(ApiResponse.success(response, 'Precio calculado exitosamente'));
 });
 
 /**
@@ -748,6 +867,60 @@ const publishPiecePrice = catchAsync(async (req, res) => {
   }, 'Precio publicado exitosamente'));
 });
 
+/**
+ * Obtener histórico de precios de una pieza
+ */
+const getPieceHistory = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const { zone_id, limit = 12 } = req.query;
+
+  let query = `
+    SELECT 
+      pp.id,
+      pp.zone_id,
+      z.name as zone_name,
+      pp.base_price as price_per_unit,
+      pp.effective_date,
+      pp.created_at,
+      pp.updated_at,
+      u.first_name + ' ' + u.last_name as created_by_name
+    FROM piece_prices pp
+    INNER JOIN zones z ON pp.zone_id = z.id
+    LEFT JOIN users u ON pp.created_by = u.id
+    WHERE pp.piece_id = @piece_id
+      ${zone_id ? 'AND pp.zone_id = @zone_id' : ''}
+      AND pp.is_active = 1
+    ORDER BY pp.effective_date DESC
+    OFFSET 0 ROWS FETCH NEXT @limit ROWS ONLY
+  `;
+
+  const result = await executeQuery(query, {
+    piece_id: parseInt(id),
+    zone_id: zone_id ? parseInt(zone_id) : null,
+    limit: parseInt(limit)
+  });
+
+  // Calcular deltas mes a mes
+  const history = result.recordset.map((price, index) => {
+    const previousPrice = result.recordset[index + 1];
+    if (previousPrice && previousPrice.zone_id === price.zone_id) {
+      const delta = price.price_per_unit - previousPrice.price_per_unit;
+      const deltaPercent = (delta / previousPrice.price_per_unit) * 100;
+      
+      return {
+        ...price,
+        previous_price: previousPrice.price_per_unit,
+        delta: delta,
+        delta_percent: deltaPercent,
+        trend: delta > 0 ? 'up' : delta < 0 ? 'down' : 'equal'
+      };
+    }
+    return price;
+  });
+
+  res.json(ApiResponse.success(history, 'Histórico de precios obtenido exitosamente'));
+});
+
 module.exports = {
   generatePieceCode,
   getPieces,
@@ -759,5 +932,6 @@ module.exports = {
   getPiecePrices,
   updatePiecePrice,
   calculatePiecePrice,
-  publishPiecePrice
+  publishPiecePrice,
+  getPieceHistory
 };

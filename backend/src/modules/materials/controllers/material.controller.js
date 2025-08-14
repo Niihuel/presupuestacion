@@ -465,6 +465,146 @@ class MaterialController {
       errorResponse(res, error);
     }
   }
+
+  /**
+   * GET /api/materials/:id/where-used
+   * Obtener piezas que utilizan este material (BOM / Factor fundamental)
+   */
+  async getWhereUsed(req, res) {
+    try {
+      const { id } = req.params;
+      const { zone_id, month_date } = req.query;
+      
+      if (!id || isNaN(id)) {
+        return errorResponse(res, { message: 'ID de material inválido', statusCode: 400 });
+      }
+
+      if (!zone_id) {
+        return errorResponse(res, { message: 'zone_id es requerido', statusCode: 400 });
+      }
+
+      const date = month_date || new Date().toISOString().split('T')[0];
+      const result = await materialService.getWhereUsed(parseInt(id), parseInt(zone_id), date);
+      
+      successResponse(res, result, 'Uso del material obtenido correctamente');
+    } catch (error) {
+      errorResponse(res, error);
+    }
+  }
+
+  /**
+   * POST /api/materials/prices/close-month
+   * Cerrar mes para precios de materiales
+   */
+  async closeMonth(req, res) {
+    try {
+      const { zone_id, month_date } = req.body;
+      const userId = req.user?.id;
+      
+      if (!zone_id || !month_date) {
+        return errorResponse(res, { 
+          message: 'zone_id y month_date son requeridos',
+          statusCode: 400 
+        });
+      }
+
+      const result = await materialService.closeMonth(
+        parseInt(zone_id), 
+        month_date, 
+        userId
+      );
+      
+      successResponse(res, result, 'Mes cerrado correctamente');
+    } catch (error) {
+      errorResponse(res, error);
+    }
+  }
+
+  /**
+   * POST /api/materials/import-csv
+   * Importar precios de materiales desde CSV
+   */
+  async importFromCSV(req, res) {
+    try {
+      const { zone_id, month_date, data } = req.body;
+      const userId = req.user?.id;
+      
+      if (!zone_id || !month_date || !data) {
+        return errorResponse(res, { 
+          message: 'zone_id, month_date y data son requeridos',
+          statusCode: 400 
+        });
+      }
+
+      const result = await materialService.importPricesFromCSV(
+        parseInt(zone_id),
+        month_date,
+        data,
+        userId
+      );
+      
+      successResponse(res, result, 'Precios importados correctamente');
+    } catch (error) {
+      errorResponse(res, error);
+    }
+  }
+
+  /**
+   * GET /api/materials/export-csv
+   * Exportar precios de materiales a CSV
+   */
+  async exportToCSV(req, res) {
+    try {
+      const { zone_id, month_date } = req.query;
+      
+      if (!zone_id) {
+        return errorResponse(res, { 
+          message: 'zone_id es requerido',
+          statusCode: 400 
+        });
+      }
+
+      const date = month_date || new Date().toISOString().split('T')[0];
+      const csvData = await materialService.exportPricesToCSV(
+        parseInt(zone_id),
+        date
+      );
+      
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename="material_prices_${zone_id}_${date}.csv"`);
+      res.send(csvData);
+    } catch (error) {
+      errorResponse(res, error);
+    }
+  }
+
+  /**
+   * POST /api/materials/recalculate-impact
+   * Recalcular impacto de cambios de precio en piezas
+   */
+  async recalculateImpact(req, res) {
+    try {
+      const { material_id, zone_id, month_date } = req.body;
+      
+      if (!material_id || !zone_id) {
+        return errorResponse(res, { 
+          message: 'material_id y zone_id son requeridos',
+          statusCode: 400 
+        });
+      }
+
+      const date = month_date || new Date().toISOString().split('T')[0];
+      const result = await materialService.recalculateImpact(
+        parseInt(material_id),
+        parseInt(zone_id),
+        date
+      );
+      
+      successResponse(res, result, 'Impacto recalculado correctamente');
+    } catch (error) {
+      errorResponse(res, error);
+    }
+  }
 }
 
 module.exports = new MaterialController();

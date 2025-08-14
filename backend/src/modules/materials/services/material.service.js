@@ -485,6 +485,377 @@ class MaterialService {
       throw new AppError('Error al eliminar material', 500);
     }
   }
+
+  /**
+   * Obtener piezas que utilizan este material (Where Used / BOM Analysis)
+   */
+  async getWhereUsed(materialId, zoneId, monthDate) {
+    try {
+      const pool = await getPool();
+      
+      // Query para obtener piezas que usan este material con cálculo de impacto
+      const query = `
+        WITH material_price AS (
+          SELECT TOP 1 price
+          FROM material_plant_prices
+          WHERE material_id = @material_id
+            AND zone_id = @zone_id
+            AND valid_from <= @month_date
+            AND (valid_until IS NULL OR valid_until >= @month_date)
+            AND is_active = 1
+          ORDER BY valid_from DESC
+        ),
+        piece_costs AS (
+          SELECT 
+            p.id as piece_id,
+            p.code as piece_code,
+            p.name as piece_name,
+            um.code as unit_code,
+            pmf.quantity_per_unit,
+            pmf.waste_factor,
+            -- Consumo efectivo = quantity * (1 + waste)
+            pmf.quantity_per_unit * (1 + ISNULL(pmf.waste_factor, 0)) as effective_consumption,
+            -- Costo aportado = consumo efectivo * precio del material
+            pmf.quantity_per_unit * (1 + ISNULL(pmf.waste_factor, 0)) * ISNULL(mp.price, 0) as contributed_cost,
+            mp.price as material_price,
+            -- Obtener costo total de materiales de la pieza
+            (
+              SELECT SUM(pmf2.quantity_per_unit * (1 + ISNULL(pmf2.waste_factor, 0)) * ISNULL(mpp2.price, 0))
+              FROM piece_material_formulas pmf2
+              LEFT JOIN (
+                SELECT m2.id, 
+                  (SELECT TOP 1 price 
+                   FROM material_plant_prices mpp3
+                   WHERE mpp3.material_id = m2.id
+                     AND mpp3.zone_id = @zone_id
+                     AND mpp3.valid_from <= @month_date
+                     AND (mpp3.valid_until IS NULL OR mpp3.valid_until >= @month_date)
+                     AND mpp3.is_active = 1
+                   ORDER BY mpp3.valid_from DESC
+                  ) as price
+                FROM materials m2
+              ) mpp2 ON pmf2.material_id = mpp2.id
+              WHERE pmf2.piece_id = p.id
+            ) as total_material_cost
+          FROM pieces p
+          INNER JOIN piece_material_formulas pmf ON p.id = pmf.piece_id
+          INNER JOIN units_of_measure um ON p.unit_id = um.id
+          CROSS JOIN material_price mp
+          WHERE pmf.material_id = @material_id
+            AND p.is_active = 1
+        )
+        SELECT 
+          piece_id,
+          piece_code,
+          piece_name,
+          unit_code,
+          quantity_per_unit,
+          waste_factor,
+          effective_consumption,
+          material_price,
+          contributed_cost,
+          total_material_cost,
+          -- Porcentaje de participación
+          CASE 
+            WHEN total_material_cost > 0 
+            THEN (contributed_cost / total_material_cost) * 100
+            ELSE 0
+          END as participation_percent,
+          -- Precio publicado más reciente de la pieza
+          (
+            SELECT TOP 1 pp.base_price
+            FROM piece_prices pp
+            WHERE pp.piece_id = piece_id
+              AND pp.zone_id = @zone_id
+              AND pp.effective_date <= @month_date
+            ORDER BY pp.effective_date DESC
+          ) as published_price
+        FROM piece_costs
+        ORDER BY participation_percent DESC, piece_name
+      `;
+
+      const result = await pool.request()
+        .input('material_id', sql.Int, materialId)
+        .input('zone_id', sql.Int, zoneId)
+        .input('month_date', sql.Date, monthDate)
+        .query(query);
+
+      // Obtener información del material
+      const materialQuery = `
+        SELECT code, name, unit, category
+        FROM materials
+        WHERE id = @material_id
+      `;
+
+      const materialResult = await pool.request()
+        .input('material_id', sql.Int, materialId)
+        .query(materialQuery);
+
+      const material = materialResult.recordset[0];
+
+      return {
+        material: material,
+        zone_id: zoneId,
+        month_date: monthDate,
+        affected_pieces: result.recordset,
+        total_pieces: result.recordset.length,
+        total_impact: result.recordset.reduce((sum, p) => sum + (p.contributed_cost || 0), 0)
+      };
+    } catch (error) {
+      console.error('Error getting where used:', error);
+      throw new AppError('Error al obtener uso del material', 500);
+    }
+  }
+
+  /**
+   * Cerrar mes para precios de materiales
+   */
+  async closeMonth(zoneId, monthDate, userId) {
+    try {
+      const pool = await getPool();
+      
+      // Verificar si el mes ya está cerrado
+      const checkQuery = `
+        SELECT COUNT(*) as count
+        FROM material_plant_prices
+        WHERE zone_id = @zone_id
+          AND YEAR(valid_from) = YEAR(@month_date)
+          AND MONTH(valid_from) = MONTH(@month_date)
+          AND is_closed = 1
+      `;
+
+      const checkResult = await pool.request()
+        .input('zone_id', sql.Int, zoneId)
+        .input('month_date', sql.Date, monthDate)
+        .query(checkQuery);
+
+      if (checkResult.recordset[0].count > 0) {
+        throw new AppError('El mes ya está cerrado para esta zona', 400);
+      }
+
+      // Marcar todos los precios del mes como cerrados
+      const closeQuery = `
+        UPDATE material_plant_prices
+        SET is_closed = 1,
+            closed_by = @user_id,
+            closed_at = GETDATE()
+        WHERE zone_id = @zone_id
+          AND YEAR(valid_from) = YEAR(@month_date)
+          AND MONTH(valid_from) = MONTH(@month_date)
+          AND is_active = 1
+      `;
+
+      const result = await pool.request()
+        .input('zone_id', sql.Int, zoneId)
+        .input('month_date', sql.Date, monthDate)
+        .input('user_id', sql.Int, userId)
+        .query(closeQuery);
+
+      return {
+        message: 'Mes cerrado correctamente',
+        affected_records: result.rowsAffected[0]
+      };
+    } catch (error) {
+      console.error('Error closing month:', error);
+      if (error instanceof AppError) throw error;
+      throw new AppError('Error al cerrar el mes', 500);
+    }
+  }
+
+  /**
+   * Importar precios desde CSV
+   */
+  async importPricesFromCSV(zoneId, monthDate, data, userId) {
+    try {
+      const pool = await getPool();
+      const transaction = pool.transaction();
+      await transaction.begin();
+
+      let imported = 0;
+      let failed = 0;
+      const errors = [];
+
+      try {
+        for (const row of data) {
+          try {
+            // Buscar material por código
+            const materialQuery = `
+              SELECT id FROM materials WHERE code = @code AND is_active = 1
+            `;
+
+            const materialResult = await transaction.request()
+              .input('code', sql.NVarChar, row.material_code)
+              .query(materialQuery);
+
+            if (materialResult.recordset.length === 0) {
+              errors.push(`Material ${row.material_code} no encontrado`);
+              failed++;
+              continue;
+            }
+
+            const materialId = materialResult.recordset[0].id;
+
+            // Insertar o actualizar precio
+            const upsertQuery = `
+              MERGE material_plant_prices AS target
+              USING (SELECT @material_id as material_id, @zone_id as zone_id, @month_date as valid_from) AS source
+              ON target.material_id = source.material_id 
+                AND target.zone_id = source.zone_id
+                AND target.valid_from = source.valid_from
+              WHEN MATCHED THEN
+                UPDATE SET 
+                  price = @price,
+                  updated_by = @user_id,
+                  updated_at = GETDATE()
+              WHEN NOT MATCHED THEN
+                INSERT (material_id, zone_id, price, valid_from, is_active, created_by, created_at)
+                VALUES (@material_id, @zone_id, @price, @month_date, 1, @user_id, GETDATE());
+            `;
+
+            await transaction.request()
+              .input('material_id', sql.Int, materialId)
+              .input('zone_id', sql.Int, zoneId)
+              .input('price', sql.Decimal(15, 2), parseFloat(row.price))
+              .input('month_date', sql.Date, monthDate)
+              .input('user_id', sql.Int, userId)
+              .query(upsertQuery);
+
+            imported++;
+          } catch (error) {
+            errors.push(`Error en fila: ${error.message}`);
+            failed++;
+          }
+        }
+
+        await transaction.commit();
+
+        return {
+          success: true,
+          imported: imported,
+          failed: failed,
+          errors: errors
+        };
+      } catch (error) {
+        await transaction.rollback();
+        throw error;
+      }
+    } catch (error) {
+      console.error('Error importing prices:', error);
+      throw new AppError('Error al importar precios', 500);
+    }
+  }
+
+  /**
+   * Exportar precios a CSV
+   */
+  async exportPricesToCSV(zoneId, monthDate) {
+    try {
+      const pool = await getPool();
+      
+      const query = `
+        SELECT 
+          m.code as material_code,
+          m.name as material_name,
+          m.category,
+          m.unit,
+          mpp.price,
+          mpp.valid_from,
+          mpp.valid_until
+        FROM materials m
+        LEFT JOIN material_plant_prices mpp ON m.id = mpp.material_id
+          AND mpp.zone_id = @zone_id
+          AND mpp.valid_from <= @month_date
+          AND (mpp.valid_until IS NULL OR mpp.valid_until >= @month_date)
+          AND mpp.is_active = 1
+        WHERE m.is_active = 1
+        ORDER BY m.category, m.name
+      `;
+
+      const result = await pool.request()
+        .input('zone_id', sql.Int, zoneId)
+        .input('month_date', sql.Date, monthDate)
+        .query(query);
+
+      // Generar CSV
+      const headers = ['Código', 'Nombre', 'Categoría', 'Unidad', 'Precio', 'Vigente Desde', 'Vigente Hasta'];
+      const rows = result.recordset.map(row => [
+        row.material_code,
+        row.material_name,
+        row.category,
+        row.unit,
+        row.price || 0,
+        row.valid_from ? new Date(row.valid_from).toISOString().split('T')[0] : '',
+        row.valid_until ? new Date(row.valid_until).toISOString().split('T')[0] : ''
+      ]);
+
+      const csv = [
+        headers.join(','),
+        ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+      ].join('\n');
+
+      return csv;
+    } catch (error) {
+      console.error('Error exporting prices:', error);
+      throw new AppError('Error al exportar precios', 500);
+    }
+  }
+
+  /**
+   * Recalcular impacto de cambio de precio en piezas
+   */
+  async recalculateImpact(materialId, zoneId, monthDate) {
+    try {
+      const pool = await getPool();
+      
+      // Obtener piezas afectadas con nuevo cálculo
+      const whereUsed = await this.getWhereUsed(materialId, zoneId, monthDate);
+      
+      // Para cada pieza afectada, recalcular su precio total si es necesario
+      const updates = [];
+      
+      for (const piece of whereUsed.affected_pieces) {
+        // Calcular nuevo precio usando TVF
+        const priceQuery = `
+          SELECT total FROM dbo.TVF_piece_cost_breakdown(@piece_id, @zone_id, @as_of_date)
+        `;
+
+        const priceResult = await pool.request()
+          .input('piece_id', sql.Int, piece.piece_id)
+          .input('zone_id', sql.Int, zoneId)
+          .input('as_of_date', sql.Date, monthDate)
+          .query(priceQuery);
+
+        if (priceResult.recordset.length > 0) {
+          const newPrice = priceResult.recordset[0].total;
+          const oldPrice = piece.published_price || 0;
+          const delta = newPrice - oldPrice;
+          const deltaPercent = oldPrice > 0 ? (delta / oldPrice) * 100 : 0;
+
+          updates.push({
+            piece_id: piece.piece_id,
+            piece_code: piece.piece_code,
+            piece_name: piece.piece_name,
+            old_price: oldPrice,
+            new_price: newPrice,
+            delta: delta,
+            delta_percent: deltaPercent
+          });
+        }
+      }
+
+      return {
+        material_id: materialId,
+        zone_id: zoneId,
+        month_date: monthDate,
+        affected_pieces: whereUsed.affected_pieces.length,
+        price_updates: updates,
+        total_impact: updates.reduce((sum, u) => sum + Math.abs(u.delta), 0)
+      };
+    } catch (error) {
+      console.error('Error recalculating impact:', error);
+      throw new AppError('Error al recalcular impacto', 500);
+    }
+  }
 }
 
 module.exports = new MaterialService();

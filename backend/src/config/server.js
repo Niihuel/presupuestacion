@@ -27,7 +27,9 @@ const {
 	rutasAdmin: adminRoutes,
 	rutasLogistica: logisticsRoutes,
 	rutasCalculistas: calculistaRoutes,
-	rutasPlantas: plantasRoutes
+	rutasPlantas: plantasRoutes,
+	rutasPoliticas,
+	rutasTiposCamion
 } = require('../modulos');
 
 // Import passport strategies  
@@ -201,6 +203,8 @@ app.use('/api/v1/plantas', plantasRoutes);
 app.use('/api/v1', systemRoutes);
 app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1', logisticsRoutes);
+app.use('/api/v1/politicas', rutasPoliticas);
+app.use('/api/v1/tipos-camion', rutasTiposCamion);
 
 // Rutas en español (alias)
 app.use('/api/v1/autenticacion', authRoutes);

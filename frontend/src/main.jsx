@@ -3,11 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { QueryProvider } from '@nucleo/providers';
-<<<<<<< Current (Your changes)
-import { LimiteErrores as ErrorBoundary } from '@compartido/components';
-=======
-import ErrorBoundary from '@compartido/componentes/LimiteErrores.jsx';
->>>>>>> Incoming (Background Agent changes)
+import { ErrorBoundary } from '@compartido/componentes';
 import App from './App.jsx';
 import './index.css';
 

@@ -42,7 +42,7 @@ import {
   useDeleteZone,
   useCreateZone,
   useUpdateZone
-} from '@shared/hooks/useZonesHook';
+} from '@compartido/hooks/useZonas';
 
 // Componentes
 import ZoneCard from './ZoneCard';

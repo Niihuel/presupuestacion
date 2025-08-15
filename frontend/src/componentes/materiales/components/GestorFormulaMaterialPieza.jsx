@@ -26,8 +26,8 @@ import {
 } from 'lucide-react';
 
 import { usePieceMaterialFormula } from '@shared/hooks/usePieceMaterialFormula';
-import { useMaterials } from '@shared/hooks/useMaterialsHook';
-import { usePieces } from '@shared/hooks/usePiecesHook';
+import useMateriales from '@compartido/hooks/useMateriales';
+import usePiezas from '@compartido/hooks/usePiezas';
 import { useNotifications } from '@shared/hooks/useNotifications';
 
 const PieceMaterialFormulaManager = ({ 

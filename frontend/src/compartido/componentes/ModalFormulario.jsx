@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import BaseModal from './BaseModal';
+import ModalBase from './ModalBase.jsx';
 
 const FormModal = ({ 
   isOpen, 
@@ -40,7 +40,7 @@ const FormModal = ({
   };
 
   return (
-    <BaseModal
+    <ModalBase
       isOpen={isOpen}
       onClose={onClose}
       title={title}
@@ -76,7 +76,7 @@ const FormModal = ({
           </button>
         </div>
       </form>
-    </BaseModal>
+    </ModalBase>
   );
 };
 

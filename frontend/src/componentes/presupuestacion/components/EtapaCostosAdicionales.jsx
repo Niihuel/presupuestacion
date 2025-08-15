@@ -6,7 +6,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { DollarSign, Truck, Wrench, AlertCircle, Info, Plus } from 'lucide-react';
-import quotationService from '../../../compartido/services/quotation.service';
+import { quotationService } from '@compartido/servicios';
 
 const EtapaCostosAdicionales = ({ data, onChange, errors = {} }) => {
   const [localData, setLocalData] = useState({

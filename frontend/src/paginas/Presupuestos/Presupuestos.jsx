@@ -27,7 +27,7 @@ import {
 } from 'lucide-react';
 
 // Hooks
-import { useQuotations } from '@compartido/hooks/useQuotationsHook';
+import { useCotizaciones as useQuotations } from '@compartido/hooks';
 
 const PresupuestosModern = () => {
   const navigate = useNavigate();

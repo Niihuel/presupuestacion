@@ -22,7 +22,7 @@ import {
   Loader2,
   RefreshCw
 } from 'lucide-react';
-import { useCreateMaterial, useUpdateMaterial } from '@compartido/hooks/useMaterialsHook';
+import { useMateriales as useMaterials } from '@compartido/hooks';
 import { useNotifications } from '@compartido/hooks/useNotificaciones';
 import { materialService } from '@compartido/servicios';
 
@@ -43,6 +43,7 @@ const MaterialModal = ({ material, mode, zones, onClose }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGeneratingCode, setIsGeneratingCode] = useState(false);
 
+  const { useCreateMaterial, useUpdateMaterial } = useMaterials;
   const createMaterial = useCreateMaterial();
   const updateMaterial = useUpdateMaterial();
   const { showNotification } = useNotifications();

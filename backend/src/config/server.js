@@ -191,6 +191,19 @@ app.use('/api/v1', systemRoutes);
 app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1', logisticsRoutes);
 
+// Rutas en español (alias)
+app.use('/api/v1/autenticacion', authRoutes);
+app.use('/api/v1/cotizaciones', quotationRoutes);
+app.use('/api/v1/zonas', zoneRoutes);
+app.use('/api/v1/clientes', customerRoutes);
+app.use('/api/v1/proyectos', projectRoutes);
+app.use('/api/v1/piezas', pieceRoutes);
+app.use('/api/v1/tablero', dashboardRoutes);
+app.use('/api/v1/sistema', systemRoutes);
+app.use('/api/v1/materiales', materialRoutes);
+app.use('/api/v1/administracion', adminRoutes);
+app.use('/api/v1/logistica', logisticsRoutes);
+
 
 // Ruta temporal para testing de clientes
 app.use('/api/v1/customers-test', require('../modules/customers/routes/customer.test.routes'));

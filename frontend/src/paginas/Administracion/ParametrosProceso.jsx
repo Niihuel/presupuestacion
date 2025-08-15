@@ -12,7 +12,7 @@ import {
   Check,
   X
 } from 'lucide-react';
-import { useZones } from '@compartido/hooks/useZonesHook';
+import { useZones } from '@compartido/hooks/useZonas';
 import { AdminShell, AdminToolbar, AdminCard, AdminToast } from '@compartido/componentes/AdminUI';
 
 const ProcessParams = () => {

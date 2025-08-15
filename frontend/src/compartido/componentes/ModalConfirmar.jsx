@@ -8,7 +8,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { AlertTriangle, Trash2, CheckCircle, AlertCircle } from 'lucide-react';
-import BaseModal from './BaseModal';
+import ModalBase from './ModalBase.jsx';
 
 const ConfirmModal = ({ 
   isOpen, 
@@ -58,7 +58,7 @@ const ConfirmModal = ({
   };
 
   return (
-    <BaseModal
+    <ModalBase
       isOpen={isOpen}
       onClose={onClose}
       title={title}
@@ -103,7 +103,7 @@ const ConfirmModal = ({
           {isLoading ? 'Procesando...' : confirmText}
         </button>
       </div>
-    </BaseModal>
+    </ModalBase>
   );
 };
 

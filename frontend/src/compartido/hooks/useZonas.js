@@ -10,7 +10,7 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import zoneService from '../services/zone.service';
+import { zoneService } from '../servicios';
 import { toast } from 'sonner';
 
 // =================== QUERY KEYS ===================

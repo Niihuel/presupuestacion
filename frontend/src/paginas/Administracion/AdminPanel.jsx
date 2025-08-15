@@ -11,6 +11,7 @@ import { LayoutDashboard, Users, Shield, Settings, Package, Cog, ListTree, Perce
 import MaterialsPrices from './MaterialsPrices';
 import ProcessParams from './ProcessParams';
 import AdminDashboard from './AdminDashboard';
+import { AdminShell } from '@compartido/componentes/AdminUI';
 import PiecePrices from './PiecePrices';
 import BOMEditor from './BOMEditor';
 import UserManagement from './UserManagement';
@@ -59,8 +60,11 @@ const AdminPanel = () => {
       case 'bom':
         return <BOMEditor />;
       case 'politicas':
+        return <(await import('./AdminPolicies.jsx')).default />;
       case 'camiones':
+        return <(await import('./AdminTrucks.jsx')).default />;
       case 'transporte':
+        return <(await import('./AdminTransportMounting.jsx')).default />;
       case 'precios':
         return <PiecePrices />;
       case 'comparativos':
@@ -72,28 +76,33 @@ const AdminPanel = () => {
   }, [activeTab]);
 
   return (
-    <div className="space-y-6">
-      {/* Tabs */}
-      <div className="bg-white rounded-lg shadow p-2 flex items-center gap-2">
-        {TABS.map(({ id, label, icon: Icon }) => (
-          <button
-            key={id}
-            onClick={() => setTab(id)}
-            className={`inline-flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-              activeTab === id
-                ? 'bg-purple-100 text-purple-700'
-                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-            }`}
-          >
-            <Icon className="h-4 w-4 mr-2" />
-            {label}
-          </button>
-        ))}
+    <AdminShell
+      title="Administración"
+      subtitle="Gestione catálogos, parámetros y políticas del sistema"
+      actions={null}
+    >
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {TABS.map(({ id, label, icon: Icon }) => (
+            <button
+              key={id}
+              onClick={() => setTab(id)}
+              className={`inline-flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                activeTab === id
+                  ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                  : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50'
+              }`}
+              aria-pressed={activeTab === id}
+              aria-label={`Tab ${label}`}
+            >
+              <Icon className="h-4 w-4 mr-2" />
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
-
-      {/* Content */}
-      <div>{CurrentTab}</div>
-    </div>
+      <div className="mt-6">{CurrentTab}</div>
+    </AdminShell>
   );
 };
 

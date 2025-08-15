@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { QueryProvider } from '@nucleo/providers';
-import ErrorBoundary from '@compartido/components/ErrorBoundary';
+import { LimiteErrores as ErrorBoundary } from '@compartido/components';
 import App from './App.jsx';
 import './index.css';
 

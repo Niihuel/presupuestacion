@@ -7,7 +7,7 @@
 
 import { AlertTriangle, Info, CheckCircle, XCircle, X } from 'lucide-react';
 import PropTypes from 'prop-types';
-import { Spinner } from './LoadingState';
+import { Spinner } from './EstadoCargando';
 
 const VARIANTS = {
   info: {

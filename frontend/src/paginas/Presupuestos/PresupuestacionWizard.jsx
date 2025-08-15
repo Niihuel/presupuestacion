@@ -38,7 +38,7 @@ import { usePresupuestacionWizard } from '@componentes/presupuestacion/hooks/use
 import { useWizardNavigation } from '@componentes/presupuestacion/hooks/useWizardNavigation';
 
 // Hooks y servicios
-import { useNotifications } from '@compartido/hooks/useNotifications';
+import { useNotificaciones as useNotifications } from '@compartido/hooks';
 
 const ETAPAS = [
   { 

@@ -17,6 +17,7 @@ const { authRoutes, quotationRoutes, zoneRoutes, customerRoutes, projectRoutes, 
 
 // Import individual routes
 const calculistaRoutes = require('../routes/calculista.routes');
+const plantasRoutes = require('../routes/planta.routes');
 
 // Import passport strategies  
 require('../modules/auth/passport');
@@ -185,6 +186,7 @@ app.use('/api/v1/pieces', pieceRoutes);
 app.use('/api/v1/dashboard', dashboardRoutes);
 app.use('/api/v1/calculistas', calculistaRoutes);
 app.use('/api/v1/materials', materialRoutes);
+app.use('/api/v1/plantas', plantasRoutes);
 app.use('/api/v1', systemRoutes);
 app.use('/api/v1/admin', adminRoutes);
 

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { authService } from '@shared/services';
 import { useNotifications } from '@shared/hooks/useNotifications';
-import LoadingState from '@compartido/components/LoadingState';
+import LoadingState from '@compartido/components';
 import paschiniIcon from '@recursos/images/paschini-icon.png';
 import pretensaIcon from '@recursos/images/pretensa-icon.png';
 

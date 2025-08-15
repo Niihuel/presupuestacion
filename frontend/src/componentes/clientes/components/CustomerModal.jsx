@@ -17,9 +17,8 @@ import {
   AlertCircle
 } from 'lucide-react';
 
-import BaseModal from '@shared/components/BaseModal';
+import { ModalBase as BaseModal, LoadingSpinner } from '@compartido/components';
 import { useCreateCustomer, useUpdateCustomer } from '@shared/hooks/useCustomersHook';
-import LoadingSpinner from '@shared/components/LoadingSpinner';
 
 const CustomerModal = ({ isOpen, onClose, customer = null }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);

@@ -1,18 +1,9 @@
 /**
- * Componente de paginación
- * 
- * Paginación moderna con navegación rápida y responsive
+ * Componente de paginación (duplicado en inglés) - ELIMINAR
+ * Migrado a `Paginacion.jsx`
  */
 
-import { ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
-
-const Paginacion = ({ 
-  currentPage = 1, 
-  totalPages = 1, 
-  onPageChange,
-  showFirstLast = true,
-  maxVisiblePages = 5 
-}) => {
+export { default } from './Paginacion.jsx';
   if (totalPages <= 1) return null;
 
   const getVisiblePages = () => {

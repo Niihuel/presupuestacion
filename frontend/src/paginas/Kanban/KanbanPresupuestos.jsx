@@ -31,7 +31,7 @@ import {
 } from 'lucide-react';
 
 import { quotationService } from '@compartido/services';
-import { useNotifications } from '@compartido/hooks/useNotifications';
+import { useNotificaciones as useNotifications } from '@compartido/hooks';
 
 const KanbanPresupuestos = () => {
   const navigate = useNavigate();

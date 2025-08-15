@@ -27,7 +27,7 @@ import {
   Calculator
 } from 'lucide-react';
 import { useAuthStore } from '@nucleo/store/auth.store';
-import { authService } from '@compartido/services';
+import { authService } from '@compartido/servicios';
 // Importar las imágenes
 import pretensaIcon from '@recursos/images/pretensa-icon.png';
 import paschiniIcon from '@recursos/images/paschini-icon.png';

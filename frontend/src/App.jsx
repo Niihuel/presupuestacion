@@ -7,7 +7,7 @@
 
 import { Routes, Route, Navigate } from 'react-router-dom';
 import MainLayout from './layouts/MainLayout';
-import { PrivateRoute } from '@compartido/components';
+import { PrivateRoute as RutaPrivada } from '@compartido/components';
 import { 
   Login, 
   Register, 
@@ -43,12 +43,12 @@ function App() {
         <Route path="/admin/approve-user" element={<UserApproval />} />
         
         {/* Ruta de cambiar contraseña (protegida pero fuera del layout principal) */}
-        <Route element={<PrivateRoute />}>
+        <Route element={<RutaPrivada />}>
           <Route path="/auth/change-password" element={<ChangePassword />} />
         </Route>
         
         {/* Rutas protegidas con layout principal */}
-        <Route element={<PrivateRoute />}>
+        <Route element={<RutaPrivada />}>
           <Route path="/" element={<MainLayout />}>
             <Route index element={<Navigate to="/dashboard" replace />} />
             <Route path="dashboard" element={<Dashboard />} />

@@ -2,8 +2,8 @@ import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { authService } from '@compartido/services';
-import { useNotifications } from '@compartido/hooks/useNotifications';
-import LoadingState from '@compartido/components/LoadingState';
+import { useNotificaciones as useNotifications } from '@compartido/hooks';
+import LoadingState from '@compartido/components';
 import paschiniIcon from '@recursos/images/paschini-icon.png';
 import pretensaIcon from '@recursos/images/pretensa-icon.png';
 

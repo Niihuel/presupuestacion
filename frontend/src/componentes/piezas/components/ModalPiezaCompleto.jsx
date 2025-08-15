@@ -24,7 +24,7 @@ import { useCreatePiece, useUpdatePiece } from '@compartido/hooks/usePiecesHook'
 import { useZones } from '@compartido/hooks/useZonesHook';
 import { useMaterials } from '@compartido/hooks/useMaterialsHook';
 import { usePieceMaterialFormula, useUpdatePieceMaterialFormula } from '@compartido/hooks/usePieceMaterialFormula';
-import LoadingSpinner from '@compartido/components/LoadingSpinner';
+import { LoadingSpinner } from '@compartido/components';
 import pieceService from '@compartido/services/piece.service';
 
 const PIECE_FAMILIES = [

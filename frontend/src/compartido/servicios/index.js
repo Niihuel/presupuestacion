@@ -1,18 +1,18 @@
-// Services Exports
+// Exportaciones de Servicios (unificado en español)
 export { default as api } from './api.js';
-export { default as authService } from './auth.service.js';
-export { default as dashboardService } from './dashboard.service.js';
 
-// New API Services
-export { default as customerService } from './customer.service.js';
-export { default as quotationService } from './quotation.service.js';
-export { default as projectService } from './project.service.js';
-export { default as pieceService } from './piece.service.js';
-export { default as zoneService } from './zone.service.js';
-export { default as systemConfigService } from './systemConfig.service.js';
+// Servicios principales (español)
+export { default as authService } from './servicioAuth.js';
+export { default as dashboardService } from './servicioTablero.js';
+export { default as customerService } from './servicioCliente.js';
+export { default as quotationService } from './servicioCotizacion.js';
+export { default as projectService } from './servicioProyecto.js';
+export { default as pieceService } from './servicioPieza.js';
+export { default as zoneService } from './servicioZona.js';
+export { default as systemConfigService } from './servicioConfigSistema.js';
+export { default as materialService } from './servicioMaterial.js';
 
-// Utils
-export * from '../utils/calculoPresupuesto'
-export * from '../utils/precioBasePorUM'
-export * from '../utils/packing'
-export { default as materialService } from './material.service.js'
+// Utils (TypeScript modules)
+export * from '../utilidades/calculoPresupuesto.ts'
+export * from '../utilidades/precioBasePorUM.ts'
+export * from '../utilidades/empaque.ts'

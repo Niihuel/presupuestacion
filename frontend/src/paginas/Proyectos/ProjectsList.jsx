@@ -39,11 +39,11 @@ import ProjectCard from './ProjectCard';
 import ProjectModal from './ProjectModal';
 import ProjectKanban from './ProjectKanban';
 import { 
-  DeleteConfirmModal, 
-  Pagination, 
-  EmptyState, 
+  DialogoConfirmacion as DeleteConfirmModal, 
+  Paginacion as Pagination, 
+  EstadoVacio as EmptyState, 
   LoadingState 
-} from "../../shared/components";
+} from "@compartido/components";
 
 const ProjectsList = () => {
   // Estados locales

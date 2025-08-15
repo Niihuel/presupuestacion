@@ -13,7 +13,7 @@
 
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuthStore } from '@nucleo/store/auth.store';
-import { LoadingPage } from './LoadingSpinner';
+import { LoadingPage } from './CargandoSpinner';
 
 const PrivateRoute = () => {
   // Obtener estado de autenticación desde el store de Zustand

@@ -8,15 +8,15 @@
 import { useMemo } from 'react';
 import { useSearchParams, NavLink } from 'react-router-dom';
 import { LayoutDashboard, Users, Shield, Settings, Package, Cog, ListTree, Percent, Truck, DollarSign, BarChart3 } from 'lucide-react';
-import MaterialsPrices from './MaterialsPrices';
-import ProcessParams from './ProcessParams';
-import AdminDashboard from './AdminDashboard';
-import PiecePrices from './PiecePrices';
-import BOMEditor from './BOMEditor';
-import UserManagement from './UserManagement';
-import RoleManagement from './RoleManagement';
-import SystemConfig from './SystemConfig';
-import Comparativos from './Comparativos';
+import PreciosMateriales from './PreciosMateriales.jsx';
+import ParametrosProceso from './ParametrosProceso.jsx';
+import AdminDashboard from './AdminDashboard.jsx';
+import PreciosPiezas from './PreciosPiezas.jsx';
+import EditorBOM from './EditorBOM.jsx';
+import GestionUsuarios from './GestionUsuarios.jsx';
+import GestionRoles from './GestionRoles.jsx';
+import ConfiguracionSistema from './ConfiguracionSistema.jsx';
+import Comparativos from './Comparativos.jsx';
 
 const TABS = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -47,22 +47,22 @@ const AdminPanel = () => {
   const CurrentTab = useMemo(() => {
     switch (activeTab) {
       case 'users':
-        return <UserManagement />;
+        return <GestionUsuarios />;
       case 'roles':
-        return <RoleManagement />;
+        return <GestionRoles />;
       case 'config':
-        return <SystemConfig />;
+        return <ConfiguracionSistema />;
       case 'insumos':
-        return <MaterialsPrices />;
+        return <PreciosMateriales />;
       case 'parametros':
-        return <ProcessParams />;
+        return <ParametrosProceso />;
       case 'bom':
-        return <BOMEditor />;
+        return <EditorBOM />;
       case 'politicas':
       case 'camiones':
       case 'transporte':
       case 'precios':
-        return <PiecePrices />;
+        return <PreciosPiezas />;
       case 'comparativos':
         return <Comparativos />;
       case 'dashboard':

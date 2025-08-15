@@ -39,9 +39,9 @@ import {
   useMaterials, 
   useMaterialsStats,
   useDeleteMaterial 
-} from '@shared/hooks/useMaterialsHook';
-import { useZones } from '@shared/hooks/useZonesHook';
-import { useNotifications } from '@shared/hooks/useNotifications';
+} from '@compartido/hooks/useMateriales';
+import { useZonas as useZones } from '@compartido/hooks/useZonas';
+import { useNotificaciones as useNotifications } from '@compartido/hooks/useNotificaciones';
 
 // Componentes
 import MaterialCard from '@features/materials/components/MaterialCard.jsx';

@@ -7,7 +7,7 @@
 
 import React from 'react';
 import { ViewModal } from '@compartido/componentes/modals';
-import { PROJECT_STATUSES } from '@compartido/hooks/useProjectsHook';
+import { PROJECT_STATUSES } from '@compartido/hooks/useProyectos';
 
 const ProjectViewModal = ({ 
   isOpen, 

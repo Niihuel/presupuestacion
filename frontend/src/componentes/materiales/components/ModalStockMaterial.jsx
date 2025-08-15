@@ -21,7 +21,7 @@ import {
   TrendingDown,
   Calendar
 } from 'lucide-react';
-import { useUpdateMaterialStock, useMaterialStockByPlant } from '@compartido/hooks/useMaterialsHook';
+import { useUpdateMaterialStock, useMaterialStockByPlant } from '@compartido/hooks/useMateriales';
 import { useNotifications } from '@compartido/hooks/useNotificaciones';
 
 const MaterialStockModal = ({ material, zones, onClose }) => {

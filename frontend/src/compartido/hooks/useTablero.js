@@ -6,7 +6,7 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
-import { dashboardService } from '../services';
+import { dashboardService } from '../servicios';
 
 // Query Keys
 export const dashboardKeys = {

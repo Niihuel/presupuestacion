@@ -7,11 +7,7 @@
 
 import { Routes, Route, Navigate } from 'react-router-dom';
 import MainLayout from './layouts/MainLayout';
-<<<<<<< Current (Your changes)
-import { PrivateRoute as RutaPrivada } from '@compartido/components';
-=======
-import { PrivateRoute } from '@compartido/componentes';
->>>>>>> Incoming (Background Agent changes)
+import { PrivateRoute as RutaPrivada } from '@compartido/componentes';
 import { 
   Login, 
   Register, 

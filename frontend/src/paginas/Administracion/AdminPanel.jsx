@@ -8,31 +8,19 @@
 import { useMemo } from 'react';
 import { useSearchParams, NavLink } from 'react-router-dom';
 import { LayoutDashboard, Users, Shield, Settings, Package, Cog, ListTree, Percent, Truck, DollarSign, BarChart3 } from 'lucide-react';
-<<<<<<< Current (Your changes)
 import PreciosMateriales from './PreciosMateriales.jsx';
 import ParametrosProceso from './ParametrosProceso.jsx';
 import AdminDashboard from './AdminDashboard.jsx';
+import { AdminShell } from '@compartido/componentes/AdminUI';
 import PreciosPiezas from './PreciosPiezas.jsx';
 import EditorBOM from './EditorBOM.jsx';
 import GestionUsuarios from './GestionUsuarios.jsx';
 import GestionRoles from './GestionRoles.jsx';
 import ConfiguracionSistema from './ConfiguracionSistema.jsx';
 import Comparativos from './Comparativos.jsx';
-=======
-import MaterialsPrices from './PreciosMateriales.jsx';
-import ProcessParams from './ParametrosProceso.jsx';
-import AdminDashboard from './AdminDashboard';
-import { AdminShell } from '@compartido/componentes/AdminUI';
-import PiecePrices from './PreciosPiezas.jsx';
-import BOMEditor from './EditorBOM.jsx';
-import UserManagement from './GestionUsuarios.jsx';
-import RoleManagement from './GestionRoles.jsx';
-import SystemConfig from './ConfiguracionSistema.jsx';
-import Comparativos from './Comparativos';
 import AdminPolicies from './AdminPolicies.jsx';
 import AdminTrucks from './AdminTrucks.jsx';
 import AdminTransportMounting from './AdminTransportMounting.jsx';
->>>>>>> Incoming (Background Agent changes)
 
 const TABS = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },

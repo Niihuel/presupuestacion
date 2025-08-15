@@ -32,11 +32,11 @@ import {
   useUpdateProject, 
   useDeleteProject,
   PROJECT_STATUSES 
-} from '@compartido/hooks/useProjectsHook';
-import { useCustomers } from '@compartido/hooks/useCustomersHook';
+} from '@compartido/hooks/useProyectos';
+import { useClientes as useCustomers } from '@compartido/hooks';
 
 // Componentes
-import ProjectModal from '@componentes/projects/components/ProjectModal';
+import ProjectModal from '@componentes/proyectos/components/ProjectModal.jsx';
 import ProjectViewModal from './ProjectViewModal';
 import DeleteConfirmModal from '@compartido/componentes/ModalConfirmarEliminar.jsx';
 import { useNotifications } from '@compartido/hooks/useNotificaciones';

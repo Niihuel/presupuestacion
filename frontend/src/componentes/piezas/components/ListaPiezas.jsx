@@ -20,7 +20,7 @@ import {
   MapPin
 } from 'lucide-react';
 
-import { usePieces, useDeletePiece } from '@compartido/hooks/usePiecesHook';
+import { usePiezas as usePieces } from '@compartido/hooks';
 import PieceCard from './PieceCard';
 // Importar el modal desde el mismo directorio para evitar rutas incorrectas
 import PieceModalComplete from './PieceModalComplete';

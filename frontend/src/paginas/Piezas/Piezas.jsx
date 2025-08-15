@@ -35,12 +35,12 @@ import {
   useCreatePiece, 
   useUpdatePiece, 
   useDeletePiece 
-} from '@compartido/hooks/usePiecesHook';
-import { useZones } from '@compartido/hooks/useZonesHook';
+} from '@compartido/hooks/usePiezas';
+import useZonas from '@compartido/hooks/useZonas';
 
 // Componentes
-import PieceModalComplete from '@componentes/pieces/components/PieceModalComplete';
-import PieceViewModal from '@componentes/pieces/components/PieceViewModal';
+import PieceModalComplete from '@componentes/piezas/components/ModalPiezaCompleto.jsx';
+import PieceViewModal from '@componentes/piezas/components/ModalVisualizarPieza.jsx';
 import DeleteConfirmModal from '@compartido/componentes/ModalConfirmarEliminar.jsx';
 import { useNotifications } from '@compartido/hooks/useNotificaciones';
 

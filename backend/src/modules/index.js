@@ -31,10 +31,6 @@ module.exports = {
   dashboardRoutes,
   systemRoutes,
   materialRoutes,
-<<<<<<< Current (Your changes)
-  adminRoutes
-=======
   adminRoutes,
   logisticsRoutes
->>>>>>> Incoming (Background Agent changes)
 };

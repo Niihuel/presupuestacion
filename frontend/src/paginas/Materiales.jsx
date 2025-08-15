@@ -44,13 +44,13 @@ import { useZonas as useZones } from '@compartido/hooks/useZonas';
 import { useNotificaciones as useNotifications } from '@compartido/hooks/useNotificaciones';
 
 // Componentes
-import MaterialCard from '@features/materials/components/MaterialCard.jsx';
-import MaterialModal from '@features/materials/components/MaterialModal.jsx';
-import MaterialViewModal from '@features/materials/components/MaterialViewModal.jsx';
-import MaterialDeleteModal from '@features/materials/components/MaterialDeleteModal.jsx';
-import MaterialStockModal from '@features/materials/components/MaterialStockModal.jsx';
-import MaterialPriceHistoryModal from '@features/materials/components/MaterialPriceHistoryModal.jsx';
-import MaterialWhereUsed from '@componentes/materials/components/MaterialWhereUsed';
+import MaterialCard from '@componentes/materiales/components/TarjetaMaterial.jsx';
+import MaterialModal from '@componentes/materiales/components/ModalMaterial.jsx';
+import MaterialViewModal from '@componentes/materiales/components/ModalVisualizarMaterial.jsx';
+import MaterialDeleteModal from '@componentes/materiales/components/ModalEliminarMaterial.jsx';
+import MaterialStockModal from '@componentes/materiales/components/ModalStockMaterial.jsx';
+import MaterialPriceHistoryModal from '@componentes/materiales/components/ModalHistorialPreciosMaterial.jsx';
+import MaterialWhereUsed from '@componentes/materiales/components/MaterialDondeSeUsa.jsx';
 import DialogoConfirmacion from '@compartido/componentes/DialogoConfirmacion';
 
 const Materiales = () => {

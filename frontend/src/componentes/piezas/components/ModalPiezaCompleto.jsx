@@ -20,17 +20,12 @@ import {
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
-import { useCreatePiece, useUpdatePiece } from '@compartido/hooks/usePiecesHook';
-import { useZones } from '@compartido/hooks/useZonesHook';
-import { useMaterials } from '@compartido/hooks/useMaterialsHook';
-import { usePieceMaterialFormula, useUpdatePieceMaterialFormula } from '@compartido/hooks/usePieceMaterialFormula';
-<<<<<<< Current (Your changes)
-import { LoadingSpinner } from '@compartido/components';
-import pieceService from '@compartido/services/piece.service';
-=======
+import usePiezas from '@compartido/hooks/usePiezas';
+import useZonas from '@compartido/hooks/useZonas';
+import useMateriales from '@compartido/hooks/useMateriales';
+import { useFormulaMaterialPieza as usePieceMaterialFormula } from '@compartido/hooks';
 import LoadingSpinner from '@compartido/componentes/CargandoSpinner.jsx';
 import { pieceService } from '@compartido/servicios';
->>>>>>> Incoming (Background Agent changes)
 
 const PIECE_FAMILIES = [
   { id: 1, name: 'Vigas', code: 'VIG' },

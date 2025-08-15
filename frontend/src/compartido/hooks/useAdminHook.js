@@ -5,7 +5,7 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import * as adminService from '../services/admin.service';
+import * as adminService from '../servicios/servicioAdmin';
 
 // ================================
 // QUERY KEYS

@@ -6,7 +6,7 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { systemConfigService } from '../services';
+import { systemConfigService } from '../servicios';
 import { toast } from 'sonner';
 
 // Query Keys

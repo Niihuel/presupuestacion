@@ -7,7 +7,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { FormModal } from '../../shared/components/modals';
+import { FormModal } from '@compartido/componentes/modals';
 import { 
   Building2, 
   User, 
@@ -21,7 +21,7 @@ import {
   Users,
   AlertCircle
 } from 'lucide-react';
-import { useCustomers } from '../../shared/hooks/useCustomersHook';
+import { useClientes as useCustomers } from '@compartido/hooks';
 
 // Estados disponibles para proyectos
 const PROJECT_STATUSES = [

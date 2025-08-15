@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import BaseModal from './BaseModal';
+import ModalBase from './ModalBase.jsx';
 
 const ViewModal = ({ 
   isOpen, 
@@ -24,7 +24,7 @@ const ViewModal = ({
   ...props
 }) => {
   return (
-    <BaseModal
+    <ModalBase
       isOpen={isOpen}
       onClose={onClose}
       title={title}
@@ -48,7 +48,7 @@ const ViewModal = ({
           {closeText}
         </button>
       </div>
-    </BaseModal>
+    </ModalBase>
   );
 };
 

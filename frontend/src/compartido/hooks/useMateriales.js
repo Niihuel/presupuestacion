@@ -10,7 +10,7 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { materialService } from '../services/material.service';
+import { materialService } from '../servicios/servicioMaterial';
 
 // Keys para React Query
 const QUERY_KEYS = {

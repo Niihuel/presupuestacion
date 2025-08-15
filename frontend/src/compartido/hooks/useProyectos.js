@@ -6,8 +6,8 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import projectService from '../services/project.service';
-import { useNotifications } from './useNotifications';
+import { projectService } from '../servicios';
+import { useNotificaciones as useNotifications } from './useNotificaciones';
 
 // Query keys
 const projectsQueryKey = 'projects';

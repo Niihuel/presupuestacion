@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { useRegister } from '@compartido/hooks/useAuth';
+import { useAutenticacion as useRegister } from '@compartido/hooks';
 import { CampoContrasena } from '@compartido/componentes';
 import paschiniIcon from '@recursos/images/paschini-icon.png';
 import pretensaIcon from '@recursos/images/pretensa-icon.png';

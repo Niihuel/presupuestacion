@@ -42,7 +42,7 @@ import { materialService } from '@compartido/services/material.service';
 
 // Hooks
 import { useZones } from '@compartido/hooks/useZonesHook';
-import { useNotifications } from '@compartido/hooks/useNotifications';
+import { useNotifications } from '@compartido/hooks/useNotificaciones';
 
 const EtapaPiezasCantidadesAvanzada = ({ data, onChange, errors = {} }) => {
   // Estados locales

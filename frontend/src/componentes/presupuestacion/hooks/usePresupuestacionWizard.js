@@ -5,8 +5,8 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { quotationService, calcularPresupuesto, DEFAULT_INDICES, DEFAULT_TARIFAS, precioBasePorUM, unitsPerTruck } from '@compartido/services';
-import { useNotifications } from '@compartido/hooks/useNotifications';
+import { quotationService, calcularPresupuesto, DEFAULT_INDICES, DEFAULT_TARIFAS, precioBasePorUM, unitsPerTruck } from '@compartido/servicios';
+import { useNotifications } from '@compartido/hooks/useNotificaciones';
 
 export const usePresupuestacionWizard = (id = null) => {
   const queryClient = useQueryClient();

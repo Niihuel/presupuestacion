@@ -7,8 +7,8 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@nucleo/store/auth.store';
-import { authService } from '@compartido/services';
-import { useNotifications } from '@compartido/hooks/useNotifications';
+import { authService } from '@compartido/servicios';
+import { useNotifications } from '@compartido/hooks/useNotificaciones';
 
 const OAuthCallbackPage = () => {
   const { login } = useAuthStore();

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { pieceService } from '@compartido/services'
+import { pieceService } from '@compartido/servicios'
 import { DollarSign, RefreshCw, Save, Calendar, Factory, Calculator, Download, FileText } from 'lucide-react'
 import jsPDF from 'jspdf'
 import 'jspdf-autotable'

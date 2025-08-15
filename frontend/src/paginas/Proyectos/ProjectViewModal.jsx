@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { ViewModal } from '@compartido/components/modals';
+import { ViewModal } from '@compartido/componentes/modals';
 import { PROJECT_STATUSES } from '@compartido/hooks/useProjectsHook';
 
 const ProjectViewModal = ({ 

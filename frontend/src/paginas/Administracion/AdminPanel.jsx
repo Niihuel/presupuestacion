@@ -8,16 +8,19 @@
 import { useMemo } from 'react';
 import { useSearchParams, NavLink } from 'react-router-dom';
 import { LayoutDashboard, Users, Shield, Settings, Package, Cog, ListTree, Percent, Truck, DollarSign, BarChart3 } from 'lucide-react';
-import MaterialsPrices from './MaterialsPrices';
-import ProcessParams from './ProcessParams';
+import MaterialsPrices from './PreciosMateriales.jsx';
+import ProcessParams from './ParametrosProceso.jsx';
 import AdminDashboard from './AdminDashboard';
 import { AdminShell } from '@compartido/componentes/AdminUI';
-import PiecePrices from './PiecePrices';
-import BOMEditor from './BOMEditor';
-import UserManagement from './UserManagement';
-import RoleManagement from './RoleManagement';
-import SystemConfig from './SystemConfig';
+import PiecePrices from './PreciosPiezas.jsx';
+import BOMEditor from './EditorBOM.jsx';
+import UserManagement from './GestionUsuarios.jsx';
+import RoleManagement from './GestionRoles.jsx';
+import SystemConfig from './ConfiguracionSistema.jsx';
 import Comparativos from './Comparativos';
+import AdminPolicies from './AdminPolicies.jsx';
+import AdminTrucks from './AdminTrucks.jsx';
+import AdminTransportMounting from './AdminTransportMounting.jsx';
 
 const TABS = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -60,11 +63,11 @@ const AdminPanel = () => {
       case 'bom':
         return <BOMEditor />;
       case 'politicas':
-        return <(await import('./AdminPolicies.jsx')).default />;
+        return <AdminPolicies />;
       case 'camiones':
-        return <(await import('./AdminTrucks.jsx')).default />;
+        return <AdminTrucks />;
       case 'transporte':
-        return <(await import('./AdminTransportMounting.jsx')).default />;
+        return <AdminTransportMounting />;
       case 'precios':
         return <PiecePrices />;
       case 'comparativos':

@@ -25,7 +25,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 import useAdminHook from '@compartido/hooks/useAdminHook';
-import { useNotifications } from '@compartido/hooks/useNotifications';
+import { useNotifications } from '@compartido/hooks/useNotificaciones';
 
 const RoleManagement = () => {
   const { 

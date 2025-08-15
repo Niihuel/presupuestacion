@@ -51,7 +51,7 @@ import MaterialDeleteModal from '@features/materials/components/MaterialDeleteMo
 import MaterialStockModal from '@features/materials/components/MaterialStockModal.jsx';
 import MaterialPriceHistoryModal from '@features/materials/components/MaterialPriceHistoryModal.jsx';
 import MaterialWhereUsed from '@componentes/materials/components/MaterialWhereUsed';
-import DialogoConfirmacion from '@compartido/components/DialogoConfirmacion';
+import DialogoConfirmacion from '@compartido/componentes/DialogoConfirmacion';
 
 const Materiales = () => {
   // Estados locales

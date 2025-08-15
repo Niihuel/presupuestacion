@@ -25,7 +25,7 @@ import {
   AlertTriangle,
   X
 } from 'lucide-react';
-import { pieceService } from '@compartido/services';
+import { pieceService } from '@compartido/servicios';
 import { materialService } from '@compartido/services/material.service';
 import { useZones } from '@compartido/hooks/useZonesHook';
 import { useMaterials } from '@compartido/hooks/useMaterialsHook';

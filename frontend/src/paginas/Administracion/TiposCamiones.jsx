@@ -13,7 +13,7 @@ import {
   AlertCircle, CheckCircle, Info, Layers, Calculator,
   ChevronDown, ChevronUp
 } from 'lucide-react';
-import { roundWeight, ceilTrips } from '@compartido/utils/rounding';
+import { roundWeight, ceilTrips } from '@compartido/utilidades/redondeo.js';
 
 const TruckTypes = () => {
   const [loading, setLoading] = useState(false);
@@ -95,8 +95,8 @@ const TruckTypes = () => {
     
     try {
       const url = editingTruck 
-        ? `/api/truck-types/${editingTruck.id}`
-        : '/api/truck-types';
+        ? `/api/v1/truck-types/${editingTruck.id}`
+        : '/api/v1/truck-types';
       
       const response = await fetch(url, {
         method: editingTruck ? 'PUT' : 'POST',
@@ -161,7 +161,7 @@ const TruckTypes = () => {
     if (!confirm('¿Está seguro de eliminar este camión?')) return;
     
     try {
-      const response = await fetch(`/api/truck-types/${id}`, {
+      const response = await fetch(`/api/v1/truck-types/${id}`, {
         method: 'DELETE'
       });
       

@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { ConfirmModal } from '@compartido/components/modals';
+import { ConfirmModal } from '@compartido/componentes/modals';
 
 const ZoneDeleteModal = ({ 
   isOpen, 

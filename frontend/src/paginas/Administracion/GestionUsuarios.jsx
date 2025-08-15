@@ -31,7 +31,7 @@ import useAdminHook from '@compartido/hooks/useAdminHook';
 // Componentes modales
 import UserModal from './UserModal';
 import UserRolesModal from './UserRolesModal';
-import DialogoConfirmacion from '@compartido/components/DialogoConfirmacion';
+import DialogoConfirmacion from '@compartido/componentes/DialogoConfirmacion';
 
 const UserManagement = () => {
   // Estados locales

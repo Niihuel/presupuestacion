@@ -30,8 +30,8 @@ import {
   Search
 } from 'lucide-react';
 
-import { quotationService } from '@compartido/services';
-import { useNotifications } from '@compartido/hooks/useNotifications';
+import { quotationService } from '@compartido/servicios';
+import { useNotifications } from '@compartido/hooks/useNotificaciones';
 
 const KanbanPresupuestos = () => {
   const navigate = useNavigate();

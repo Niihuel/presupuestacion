@@ -7,7 +7,7 @@
 
 import { Routes, Route, Navigate } from 'react-router-dom';
 import MainLayout from './layouts/MainLayout';
-import { PrivateRoute } from '@compartido/components';
+import { PrivateRoute } from '@compartido/componentes';
 import { 
   Login, 
   Register, 

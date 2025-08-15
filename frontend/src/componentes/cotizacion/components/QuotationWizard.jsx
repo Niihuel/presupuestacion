@@ -42,8 +42,8 @@ import CalculationsStep from './wizard/CalculationsStep';
 import PreviewStep from './wizard/PreviewStep';
 
 // Componentes shared
-import { LoadingSpinner } from '@compartido/components/EstadoCarga';
-import DialogoConfirmacion from '@compartido/components/DialogoConfirmacion';
+import LoadingState from '@compartido/componentes/EstadoCargando.jsx';
+import DialogoConfirmacion from '@compartido/componentes/DialogoConfirmacion';
 
 const STEP_COMPONENTS = {
   BasicInfoStep,

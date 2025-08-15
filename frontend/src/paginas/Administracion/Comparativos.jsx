@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useQuery, useMutation } from '@tanstack/react-query'
-import { materialService, pieceService } from '@compartido/services'
+import { materialService, pieceService } from '@compartido/servicios'
 import { BarChart3, Factory, Calendar, Search, RefreshCw, ArrowUpRight, ArrowDownRight, Download, FileText } from 'lucide-react'
 import jsPDF from 'jspdf'
 import 'jspdf-autotable'

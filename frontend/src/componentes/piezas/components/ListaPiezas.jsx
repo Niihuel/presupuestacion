@@ -24,9 +24,9 @@ import { usePieces, useDeletePiece } from '@compartido/hooks/usePiecesHook';
 import PieceCard from './PieceCard';
 // Importar el modal desde el mismo directorio para evitar rutas incorrectas
 import PieceModalComplete from './PieceModalComplete';
-import DeleteConfirmModal from '@compartido/components/DeleteConfirmModal';
-import LoadingSpinner from '@compartido/components/LoadingSpinner';
-import Paginacion from '@compartido/components/Paginacion';
+import DeleteConfirmModal from '@compartido/componentes/ModalConfirmarEliminar.jsx';
+import LoadingSpinner from '@compartido/componentes/CargandoSpinner.jsx';
+import Paginacion from '@compartido/componentes/Paginacion.jsx';
 
 const PiecesList = () => {
   // Estados locales

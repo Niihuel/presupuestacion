@@ -23,8 +23,8 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { useCreateMaterial, useUpdateMaterial } from '@compartido/hooks/useMaterialsHook';
-import { useNotifications } from '@compartido/hooks/useNotifications';
-import materialService from '@compartido/services/material.service';
+import { useNotifications } from '@compartido/hooks/useNotificaciones';
+import { materialService } from '@compartido/servicios';
 
 const MaterialModal = ({ material, mode, zones, onClose }) => {
   const [formData, setFormData] = useState({

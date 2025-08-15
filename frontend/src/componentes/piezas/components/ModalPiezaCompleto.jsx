@@ -24,8 +24,8 @@ import { useCreatePiece, useUpdatePiece } from '@compartido/hooks/usePiecesHook'
 import { useZones } from '@compartido/hooks/useZonesHook';
 import { useMaterials } from '@compartido/hooks/useMaterialsHook';
 import { usePieceMaterialFormula, useUpdatePieceMaterialFormula } from '@compartido/hooks/usePieceMaterialFormula';
-import LoadingSpinner from '@compartido/components/LoadingSpinner';
-import pieceService from '@compartido/services/piece.service';
+import LoadingSpinner from '@compartido/componentes/CargandoSpinner.jsx';
+import { pieceService } from '@compartido/servicios';
 
 const PIECE_FAMILIES = [
   { id: 1, name: 'Vigas', code: 'VIG' },

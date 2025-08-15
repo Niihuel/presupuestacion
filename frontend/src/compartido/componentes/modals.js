@@ -5,8 +5,8 @@
  * del sistema para facilitar las importaciones.
  */
 
-export { default as BaseModal } from './BaseModal';
-export { default as FormModal } from './FormModal';
-export { default as ConfirmModal } from './ConfirmModal';
-export { default as ViewModal } from './ViewModal';
-export { default as DeleteConfirmModal } from './DeleteConfirmModal';
+export { default as BaseModal } from './ModalBase.jsx';
+export { default as FormModal } from './ModalFormulario.jsx';
+export { default as ConfirmModal } from './ModalConfirmar.jsx';
+export { default as ViewModal } from './ModalVer.jsx';
+export { default as DeleteConfirmModal } from './ModalConfirmarEliminar.jsx';

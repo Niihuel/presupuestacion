@@ -20,9 +20,9 @@ import {
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
-import usePiezas from '@compartido/hooks/usePiezas';
-import useZonas from '@compartido/hooks/useZonas';
-import useMateriales from '@compartido/hooks/useMateriales';
+import { useCreatePiece, useUpdatePiece } from '@compartido/hooks';
+import { useZones } from '@compartido/hooks';
+import { useMaterials } from '@compartido/hooks';
 import { usePieceMaterialFormula } from '@compartido/hooks';
 import LoadingSpinner from '@compartido/componentes/CargandoSpinner.jsx';
 import { pieceService } from '@compartido/servicios';

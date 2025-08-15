@@ -36,7 +36,7 @@ import {
   useUpdatePiece, 
   useDeletePiece 
 } from '@compartido/hooks/usePiezas';
-import useZonas from '@compartido/hooks/useZonas';
+import { useZones } from '@compartido/hooks';
 
 // Componentes
 import PieceModalComplete from '@componentes/piezas/components/ModalPiezaCompleto.jsx';

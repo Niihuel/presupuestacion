@@ -6,7 +6,16 @@
   "_moduleAliases": {
     "@shared": "./src/shared",
     "@modules": "./src/modules",
-    "@utils": "./src/shared/utils"
+    "@utils": "./src/shared/utils",
+    "@compartido": "./src/shared",
+    "@modulos": "./src/modules",
+    "@utilidades": "./src/shared/utils",
+    "@autenticacion": "./src/modules/auth",
+    "@configuracion": "./src/config",
+    "@controladores": "./src/controllers",
+    "@nucleo": "./src/core",
+    "@modelos": "./src/shared/database/models",
+    "@servicios": "./src/services"
   },
   "scripts": {
     "start": "node src/config/server.js",

@@ -9,9 +9,9 @@ const compression = require('compression');
 const morgan = require('morgan');
 const passport = require('passport');
 const rateLimit = require('express-rate-limit');
-const { connectDB } = require('../shared/database/database');
-const { logger } = require('../shared/utils/logger');
-const { errorHandler } = require('../shared/middleware/error.handler');
+const { connectDB } = require('@compartido/database/database');
+const { logger } = require('@utilidades/logger');
+const { errorHandler } = require('@compartido/middleware/error.handler');
 
 // Import routes desde agregador en español, mapeando a nombres actuales
 const {
@@ -33,7 +33,7 @@ const {
 } = require('../modulos');
 
 // Import passport strategies  
-require('../modules/auth/passport');
+require('@autenticacion/passport');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -221,7 +221,7 @@ app.use('/api/v1/logistica', logisticsRoutes);
 
 
 // Ruta temporal para testing de clientes
-app.use('/api/v1/customers-test', require('../modules/customers/routes/customer.test.routes'));
+app.use('/api/v1/customers-test', require('@modules/customers/routes/customer.test.routes'));
 
 // 404 handler
 app.use((req, res) => {

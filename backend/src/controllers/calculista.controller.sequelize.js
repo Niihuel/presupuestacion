@@ -10,8 +10,8 @@
  */
 
 const { Op } = require('sequelize');
-const { catchAsync, ApiResponse } = require('../shared/utils');
-const { Calculista, Project } = require('../shared/database/models');
+const { catchAsync, ApiResponse } = require('@utilidades');
+const { Calculista, Project } = require('@modelos');
 
 /**
  * Obtener todos los calculistas con paginación y filtros

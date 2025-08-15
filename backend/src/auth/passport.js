@@ -6,7 +6,7 @@ const MicrosoftStrategy = require('passport-microsoft').Strategy;
 const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 const User = require('../models/User.model');
-const { logger } = require('../utils/logger');
+const { logger } = require('@utilidades/logger');
 
 // Local Strategy (email/password)
 passport.use(new LocalStrategy({

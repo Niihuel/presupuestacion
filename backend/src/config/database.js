@@ -2,7 +2,7 @@
 // Este archivo se encarga de la configuración y conexión a la base de datos SQL Server.
 // Proporciona una instancia de Sequelize (ORM) y un pool de conexiones directas a SQL.
 const { Sequelize } = require('sequelize');
-const { logger } = require('../shared/utils');
+const { logger } = require('@utilidades');
 const {
   DB_HOST,
   DB_PORT,

@@ -1,7 +1,7 @@
 // src/middlewares/errorHandler.js
 // Este archivo contiene el middleware global para el manejo de errores.
-const { AppError, handleDatabaseError, catchAsync } = require('../utils/app.error');
-const { logError } = require('../utils/logger');
+const { AppError, handleDatabaseError, catchAsync } = require('@utilidades/app.error');
+const { logError } = require('@utilidades/logger');
 
 /**
  * @summary Middleware global para el manejo de errores.

@@ -1,7 +1,7 @@
 // src/shared/middleware/auth.middleware.js
 // Este archivo contiene los middlewares para la autenticación y autorización de usuarios.
 const passport = require('passport');
-const { AppError, logger } = require('../utils');
+const { AppError, logger } = require('@utilidades');
 const jwtService = require('../../modules/auth/services/jwt.service');
 const User = require('../database/models/User.model');
 

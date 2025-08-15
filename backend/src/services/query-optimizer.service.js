@@ -1,8 +1,8 @@
 // src/services/query-optimizer.service.js
 // Servicio simple para operaciones de mantenimiento/optimización (no destructivas)
 
-const { executeQuery } = require('../shared/database/database');
-const { logger } = require('../shared/utils/logger');
+const { executeQuery } = require('@compartido/database/database');
+const { logger } = require('@utilidades/logger');
 
 async function optimizeDatabase() {
   try {

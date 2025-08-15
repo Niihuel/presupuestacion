@@ -1,7 +1,7 @@
 // src/middlewares/validation.middleware.js
 // Este archivo contiene los middlewares de validación para las diferentes rutas de la aplicación.
 const { body, validationResult } = require('express-validator');
-const { ApiResponse } = require('../utils');
+const { ApiResponse } = require('@utilidades');
 
 /**
  * @summary Maneja los errores de validación.

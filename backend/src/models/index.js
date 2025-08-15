@@ -4,16 +4,16 @@
  */
 
 // Import models from their respective modules
-const User = require('../shared/database/models/User.model');
-const Company = require('../shared/database/models/Company.model');
-const Customer = require('../shared/database/models/Customer.model'); 
-const Project = require('../shared/database/models/Project.model');
-const Zone = require('../shared/database/models/Zone.model');
-const Piece = require('../shared/database/models/Piece.model');
-const PiecePrice = require('../shared/database/models/PiecePrice.model');
-const Quotation = require('../shared/database/models/Quotation.model');
-const QuotationItem = require('../shared/database/models/QuotationItem.model');
-const QuotationMounting = require('../shared/database/models/QuotationMounting.model');
+const User = require('@modelos/User.model');
+const Company = require('@modelos/Company.model');
+const Customer = require('@modelos/Customer.model'); 
+const Project = require('@modelos/Project.model');
+const Zone = require('@modelos/Zone.model');
+const Piece = require('@modelos/Piece.model');
+const PiecePrice = require('@modelos/PiecePrice.model');
+const Quotation = require('@modelos/Quotation.model');
+const QuotationItem = require('@modelos/QuotationItem.model');
+const QuotationMounting = require('@modelos/QuotationMounting.model');
 
 // Export all models
 module.exports = {

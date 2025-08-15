@@ -9,8 +9,8 @@
  */
 
 const { Op } = require('sequelize');
-const { catchAsync, ApiResponse } = require('../shared/utils');
-const { Planta } = require('../shared/database/models');
+const { catchAsync, ApiResponse } = require('@utilidades');
+const { Planta } = require('@modelos');
 
 /**
  * Obtener todas las plantas con paginación y filtros

@@ -1,5 +1,5 @@
 // src/middlewares/admin.middleware.js
-const { AppError } = require('../utils');
+const { AppError } = require('@utilidades');
 
 /**
  * Middleware para verificar que el usuario tenga permisos de administrador

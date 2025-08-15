@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const zoneController = require('../controllers/zone.controller');
-const { authenticate, authorize } = require('../../../shared/middleware/auth.middleware');
-const { validateZone, validateZonePrices } = require('../../../shared/validators/zone.validator');
+const { authenticate, authorize } = require('@compartido/middleware/auth.middleware');
+const { validateZone, validateZonePrices } = require('@compartido/validators/zone.validator');
 const { orsDistance } = require('../services/routing.service');
 
 // Rutas públicas (requieren autenticación)

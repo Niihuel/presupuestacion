@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { authenticate, authorize } = require('../../../shared/middleware/auth.middleware');
+const { authenticate, authorize } = require('@compartido/middleware/auth.middleware');
 const { body, param, validationResult } = require('express-validator');
-const { executeQuery } = require('../../../shared/database/database');
-const { AppError, catchAsync, ApiResponse } = require('../../../shared/utils');
+const { executeQuery } = require('@compartido/database/database');
+const { AppError, catchAsync, ApiResponse } = require('@utilidades');
 
 // Tipos de camión
 router.get('/', authenticate, catchAsync(async (req, res) => {

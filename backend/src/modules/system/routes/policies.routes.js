@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 
-const { authenticate, authorize } = require('../../../shared/middleware/auth.middleware');
-const { catchAsync, AppError } = require('../../../shared/utils');
-const ApiResponse = require('../../../shared/utils/ApiResponse');
-const SystemConfig = require('../../../shared/database/models/SystemConfig.model');
+const { authenticate, authorize } = require('@compartido/middleware/auth.middleware');
+const { catchAsync, AppError } = require('@utilidades');
+const ApiResponse = require('@utilidades/ApiResponse');
+const SystemConfig = require('@modelos/SystemConfig.model');
 
 const DEFAULT_POLICIES = {
 	USE_SERVER_PRICE: true,

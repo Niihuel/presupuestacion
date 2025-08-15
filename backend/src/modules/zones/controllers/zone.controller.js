@@ -1,5 +1,5 @@
-const { Zone, PiecePrice, Piece } = require('../../../shared/database/models');
-const { AppError, catchAsync, ApiResponse } = require('../../../shared/utils');
+const { Zone, PiecePrice, Piece } = require('@modelos');
+const { AppError, catchAsync, ApiResponse } = require('@utilidades');
 const { Op } = require('sequelize');
 
 class ZoneController {

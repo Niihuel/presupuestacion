@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const processParametersController = require('../controllers/processParameters.controller');
-const { authenticate } = require('@shared/middleware/auth.middleware');
+const { authenticate } = require('@compartido/middleware/auth.middleware');
 
 // Todas las rutas requieren autenticación
 router.use(authenticate);

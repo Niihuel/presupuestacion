@@ -2,7 +2,7 @@
 // Este archivo contiene los middlewares para la autenticación y autorización de usuarios.
 const passport = require('passport');
 const { AppError, logger } = require('@utilidades');
-const jwtService = require('../../modules/auth/services/jwt.service');
+const jwtService = require('@autenticacion/services/jwt.service');
 const User = require('../database/models/User.model');
 
 /**
@@ -101,7 +101,7 @@ exports.authorize = (...roles) => {
  * @param {string} module - El módulo al que pertenece el permiso.
  * @param {string} action - La acción que se quiere realizar.
  */
-const { userHasPermission } = require('../../modules/admin/services/rbac.service');
+const { userHasPermission } = require('@modules/admin/services/rbac.service');
 
 exports.checkPermission = (module, action) => {
   return async (req, res, next) => {

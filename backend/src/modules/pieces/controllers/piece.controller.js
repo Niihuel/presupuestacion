@@ -1,7 +1,7 @@
 // modules/pieces/controllers/piece.controller.js
 const { catchAsync, AppError } = require('@shared/utils/app.error');
-const { executeQuery } = require('@shared/database/database');
-const ApiResponse = require('@shared/utils/ApiResponse');
+const { executeQuery } = require('@compartido/database/database');
+const ApiResponse = require('@utilidades/ApiResponse');
 
 const generatePieceCode = async (req, res, next) => {
   try {

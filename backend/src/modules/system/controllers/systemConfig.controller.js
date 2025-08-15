@@ -8,9 +8,9 @@
  * @version 1.0.0
  */
 
-const { SystemConfig } = require('../../../shared/database/models');
-const { AppError, catchAsync, ApiResponse } = require('../../../shared/utils');
-const { logger } = require('../../../shared/utils/logger');
+const { SystemConfig } = require('@modelos');
+const { AppError, catchAsync, ApiResponse } = require('@utilidades');
+const { logger } = require('@utilidades/logger');
 
 /**
  * Configuraciones por defecto del sistema

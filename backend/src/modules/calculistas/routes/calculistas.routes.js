@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const calculistaController = require('../../../controllers/calculista.controller');
-const { authenticate, authorize } = require('../../../shared/middleware/auth.middleware');
+const { authenticate, authorize } = require('@compartido/middleware/auth.middleware');
 
 router.use(authenticate);
 

@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 
-const { authenticate, authorize } = require('../../shared/middleware/auth.middleware');
-const { executeQuery } = require('../../shared/database/database');
-const { AppError, catchAsync, ApiResponse } = require('../../shared/utils');
+const { authenticate, authorize } = require('@compartido/middleware/auth.middleware');
+const { executeQuery } = require('@compartido/database/database');
+const { AppError, catchAsync, ApiResponse } = require('@utilidades');
 
 // Todas las rutas requieren autenticación
 router.use(authenticate);

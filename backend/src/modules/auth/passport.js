@@ -4,8 +4,8 @@ const LocalStrategy = require('passport-local').Strategy;
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
-const User = require('../../shared/database/models/User.model');
-const { logger } = require('../../shared/utils/logger');
+const User = require('@modelos/User.model');
+const { logger } = require('@utilidades/logger');
 
 // Local Strategy (email/password)
 passport.use(new LocalStrategy({

@@ -16,7 +16,7 @@ const multer = require('multer');
 const systemConfigController = require('../controllers/systemConfig.controller');
 
 // Middleware de autenticación y autorización
-const { authenticate, authorize } = require('../../../shared/middleware/auth.middleware');
+const { authenticate, authorize } = require('@compartido/middleware/auth.middleware');
 
 // Configurar multer para subida de archivos
 const upload = multer({

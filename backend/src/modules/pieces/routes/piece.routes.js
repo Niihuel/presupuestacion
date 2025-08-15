@@ -1,7 +1,7 @@
 // modules/pieces/routes/piece.routes.js
 const router = require('express').Router();
 const pieceController = require('../controllers/piece.controller');
-const { authenticate } = require('@shared/middleware/auth.middleware');
+const { authenticate } = require('@compartido/middleware/auth.middleware');
 
 // Rutas públicas (si las hay)
 

@@ -19,7 +19,7 @@ const { routes: dashboardRoutes } = require('./dashboard');
 const systemRoutes = require('./system');
 const adminRoutes = require('./admin');
 const { routes: materialRoutes } = require('./materials');
-const logisticsRoutes = require('./logistics');
+const { routes: logisticsRoutes } = require('./logistics');
 
 module.exports = {
   authRoutes,

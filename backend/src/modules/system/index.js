@@ -13,8 +13,10 @@ const router = express.Router();
 
 // Importar rutas del módulo
 const systemConfigRoutes = require('./routes/systemConfig.routes');
+const policiesRoutes = require('./routes/policies.routes');
 
 // Montar las rutas
 router.use('/system', systemConfigRoutes);
+router.use('/policies', policiesRoutes);
 
 module.exports = router;

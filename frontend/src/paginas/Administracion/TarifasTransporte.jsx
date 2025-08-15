@@ -14,7 +14,7 @@ import {
   AlertCircle, CheckCircle, Calendar, MapPin,
   DollarSign, Route, ChevronDown, ChevronUp
 } from 'lucide-react';
-import { roundMoney } from '@compartido/utils/rounding';
+import { roundMoney } from '@compartido/utilidades/redondeo.js';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 

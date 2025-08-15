@@ -14,7 +14,7 @@ import {
   AlertCircle, CheckCircle, Calendar, MapPin,
   DollarSign, Weight, Clock, Truck
 } from 'lucide-react';
-import { roundMoney, roundWeight } from '@compartido/utils/rounding';
+import { roundMoney, roundWeight } from '@compartido/utilidades/redondeo.js';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 

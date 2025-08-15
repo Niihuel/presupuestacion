@@ -1,6 +1,6 @@
 const { Op } = require('sequelize');
-const User = require('../../../shared/database/models/User.model');
-const { UserRole } = require('../../../shared/database/models');
+const User = require('@modelos/User.model');
+const { UserRole } = require('@modelos');
 const { invalidateUserPermissions } = require('./rbac.service');
 
 async function listUsers({ page = 1, limit = 20, search = '', role = '', status = '' }) {

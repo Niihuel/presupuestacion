@@ -1,7 +1,7 @@
 // modules/customers/controllers/customer.controller.js
-const { Customer } = require('../../../shared/database/models');
-const ApiResponse = require('../../../shared/utils/ApiResponse');
-const { logger } = require('../../../shared/utils/logger');
+const { Customer } = require('@modelos');
+const ApiResponse = require('@utilidades/ApiResponse');
+const { logger } = require('@utilidades/logger');
 
 /**
  * Obtener todos los clientes

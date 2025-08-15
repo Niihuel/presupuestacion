@@ -10,7 +10,7 @@
 
 const express = require('express');
 const { getDashboardStats } = require('../controllers/dashboard.controller');
-const { authenticate } = require('../../../shared/middleware/auth.middleware');
+const { authenticate } = require('@compartido/middleware/auth.middleware');
 
 const router = express.Router();
 

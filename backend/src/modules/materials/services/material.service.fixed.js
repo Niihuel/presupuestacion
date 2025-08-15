@@ -1,5 +1,5 @@
 const { getPool, sql } = require('../../../config/database');
-const { AppError } = require('../../../shared/utils');
+const { AppError } = require('@utilidades');
 
 class MaterialService {
   /**

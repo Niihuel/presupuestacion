@@ -1,6 +1,6 @@
 const { Quotation, QuotationItem, QuotationMounting, Customer, Project, 
-        Zone, Piece, PiecePrice } = require('../../../shared/database/models');
-const { AppError, catchAsync, ApiResponse } = require('../../../shared/utils');
+        Zone, Piece, PiecePrice } = require('@modelos');
+const { AppError, catchAsync, ApiResponse } = require('@utilidades');
 const { Op } = require('sequelize');
 const { logCrud } = require('../../admin/services/auditLogger.service');
 const { calculateQuotationTotals } = require('../services/quotationCalc.service');

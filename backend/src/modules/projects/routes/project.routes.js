@@ -10,7 +10,7 @@ const {
   deleteProject,
   getProjectsByCustomer
 } = require('../controllers/project.controller');
-const { authenticate } = require('../../../shared/middleware/auth.middleware');
+const { authenticate } = require('@compartido/middleware/auth.middleware');
 const { parseLatLngFromIframe, orsForwardGeocode } = require('../services/geocoding.service');
 
 // Aplicar autenticación a todas las rutas

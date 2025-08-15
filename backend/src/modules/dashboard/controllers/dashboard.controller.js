@@ -16,7 +16,7 @@ const {
   Zone,
   Project,
   QuotationItem 
-} = require('../../../shared/database/models');
+} = require('@modelos');
 
 /**
  * Obtener estadísticas generales del dashboard

@@ -5,7 +5,7 @@
  */
 
 const materialService = require('../services/material.service');
-const { successResponse, errorResponse } = require('../../../shared/utils');
+const { successResponse, errorResponse } = require('@utilidades');
 const { logCrud } = require('../../admin/services/auditLogger.service');
 
 class MaterialController {

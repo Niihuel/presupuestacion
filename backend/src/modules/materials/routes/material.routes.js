@@ -8,10 +8,10 @@ const express = require('express');
 const router = express.Router();
 const materialController = require('../controllers/material.controller');
 const pieceMaterialFormulaController = require('../controllers/pieceMaterialFormula.controller');
-const { authenticate } = require('../../../shared/middleware/auth.middleware');
-const { handleValidationErrors } = require('../../../shared/middleware/validation.middleware');
+const { authenticate } = require('@compartido/middleware/auth.middleware');
+const { handleValidationErrors } = require('@compartido/middleware/validation.middleware');
 const { body, param, query } = require('express-validator');
-const { executeQuery } = require('../../../shared/database/database');
+const { executeQuery } = require('@compartido/database/database');
 
 // Middleware de autenticación para todas las rutas
 router.use(authenticate);

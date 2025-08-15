@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const quotationController = require('../controllers/quotation.controller');
-const { authenticate } = require('../../../shared/middleware/auth.middleware');
-const { validateQuotation } = require('../../../shared/validators/quotation.validator');
+const { authenticate } = require('@compartido/middleware/auth.middleware');
+const { validateQuotation } = require('@compartido/validators/quotation.validator');
 
 // Todas las rutas requieren autenticación
 router.use(authenticate);

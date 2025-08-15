@@ -1,7 +1,7 @@
 const { Op } = require('sequelize');
-const { Quotation, QuotationItem, Zone } = require('../../../shared/database/models');
-const FreightRate = require('../../../shared/database/models/FreightRate.model');
-const MountingRate = require('../../../shared/database/models/MountingRate.model');
+const { Quotation, QuotationItem, Zone } = require('@modelos');
+const FreightRate = require('@modelos/FreightRate.model');
+const MountingRate = require('@modelos/MountingRate.model');
 
 async function getFreightRateForLength(distanceKm, maxLengthMeters) {
   const rateRow = await FreightRate.findOne({

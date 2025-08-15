@@ -1,4 +1,4 @@
-const { catchAsync, AppError } = require('@shared/utils/app.error');
+const { catchAsync, AppError } = require('@utilidades/app.error');
 const { executeQuery } = require('@compartido/database/database');
 
 class ProcessParametersController {

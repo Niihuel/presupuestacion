@@ -6,10 +6,10 @@
 const express = require('express');
 const router = express.Router();
 
-const { authenticate, authorize } = require('../../shared/middleware/auth.middleware');
-const { clearAllCaches } = require('../../services/cache.service');
-const { optimizeDatabase } = require('../../services/query-optimizer.service');
-const { executeQuery } = require('../../shared/database/database');
+const { authenticate, authorize } = require('@compartido/middleware/auth.middleware');
+const { clearAllCaches } = require('@servicios/cache.service');
+const { optimizeDatabase } = require('@servicios/query-optimizer.service');
+const { executeQuery } = require('@compartido/database/database');
 const { exportAudit } = require('./services/audit.service');
 const { listUsers, assignRoleToUser, removeRoleFromUser } = require('./services/user.service');
 const roleController = require('./roles/role.controller');

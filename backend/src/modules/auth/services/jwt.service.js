@@ -2,7 +2,7 @@
 // Este archivo contiene el servicio para la generación y verificación de JSON Web Tokens (JWT).
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
-const { logger } = require('../../../shared/utils/logger');
+const { logger } = require('@utilidades/logger');
 
 class JWTService {
   /**

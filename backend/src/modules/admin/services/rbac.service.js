@@ -1,6 +1,6 @@
 const { Op } = require('sequelize');
-const { sequelize, executeQuery } = require('../../../shared/database/database');
-const { Role, RolePermission, UserRole } = require('../../../shared/database/models');
+const { sequelize, executeQuery } = require('@compartido/database/database');
+const { Role, RolePermission, UserRole } = require('@modelos');
 
 // Cache simple en memoria (puedes mover a cache.service si quieres unificar)
 const effectiveCache = new Map();

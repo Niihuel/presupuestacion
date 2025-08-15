@@ -9,10 +9,10 @@
 
 const { validationResult } = require('express-validator');
 const crypto = require('crypto');
-const User = require('../../../shared/database/models/User.model');
+const User = require('@modelos/User.model');
 const jwtService = require('../services/jwt.service');
 const { emailService } = require('../../../core/email');
-const { logger, AppError, catchAsync, ApiResponse } = require('../../../shared/utils');
+const { logger, AppError, catchAsync, ApiResponse } = require('@utilidades');
 const { getEffectivePermissions } = require('../../admin/services/rbac.service');
 const { logLogin } = require('../../admin/services/auditLogger.service');
 

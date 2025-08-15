@@ -3,7 +3,7 @@
  */
 
 const pieceMaterialFormulaService = require('../services/pieceMaterialFormula.service');
-const { successResponse, errorResponse } = require('../../../shared/utils');
+const { successResponse, errorResponse } = require('@utilidades');
 
 class PieceMaterialFormulaController {
 

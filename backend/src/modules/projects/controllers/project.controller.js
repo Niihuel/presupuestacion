@@ -1,7 +1,7 @@
 // modules/projects/controllers/project.controller.js
-const { Project, Customer } = require('../../../shared/database/models');
-const ApiResponse = require('../../../shared/utils/ApiResponse');
-const { logger } = require('../../../shared/utils/logger');
+const { Project, Customer } = require('@modelos');
+const ApiResponse = require('@utilidades/ApiResponse');
+const { logger } = require('@utilidades/logger');
 const { Op } = require('sequelize');
 const { logCrud } = require('../../admin/services/auditLogger.service');
 

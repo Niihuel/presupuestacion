@@ -1,6 +1,6 @@
 const { Op } = require('sequelize');
-const { Role, RolePermission } = require('../../../shared/database/models');
-const { executeQuery } = require('../../../shared/database/database');
+const { Role, RolePermission } = require('@modelos');
+const { executeQuery } = require('@compartido/database/database');
 const { invalidateUserPermissions } = require('../services/rbac.service');
 
 const getPermissionsCatalog = async (req, res, next) => {

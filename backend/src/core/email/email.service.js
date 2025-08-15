@@ -10,7 +10,7 @@
 const nodemailer = require('nodemailer');
 const path = require('path');
 const fs = require('fs');
-const { logger } = require('../../shared/utils/logger');
+const { logger } = require('@utilidades/logger');
 const {
   getVerificationEmailTemplate,
   getPasswordResetTemplate,

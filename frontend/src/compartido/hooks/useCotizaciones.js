@@ -7,8 +7,8 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import quotationService from '../services/quotation.service';
-import { useNotifications } from './useNotifications';
+import quotationService from '../servicios/servicioCotizacion';
+import { useNotifications } from './useNotificaciones';
 
 // Query keys
 const QUERY_KEYS = {

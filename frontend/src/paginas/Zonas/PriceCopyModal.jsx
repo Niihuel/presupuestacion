@@ -24,7 +24,7 @@ import {
   useZones, 
   useCopyPricesBetweenZones,
   useZonePrices 
-} from '@shared/hooks/useZonesHook';
+} from '@compartido/hooks/useZonas';
 
 const PriceCopyModal = ({ 
   isOpen, 

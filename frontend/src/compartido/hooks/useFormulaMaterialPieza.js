@@ -3,8 +3,8 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { materialService } from '../services/material.service';
-import { useNotifications } from './useNotifications';
+import { materialService } from '../servicios/servicioMaterial';
+import { useNotifications } from './useNotificaciones';
 
 export const usePieceMaterialFormula = (pieceId) => {
   const queryClient = useQueryClient();

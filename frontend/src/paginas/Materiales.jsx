@@ -40,8 +40,8 @@ import {
   useMaterialsStats,
   useDeleteMaterial 
 } from '@compartido/hooks/useMateriales';
-import { useZonas as useZones } from '@compartido/hooks/useZonas';
-import { useNotificaciones as useNotifications } from '@compartido/hooks/useNotificaciones';
+import { useZones } from '@compartido/hooks';
+import { useNotifications } from '@compartido/hooks/useNotificaciones';
 
 // Componentes
 import MaterialCard from '@componentes/materiales/components/TarjetaMaterial.jsx';

@@ -19,7 +19,7 @@ import {
   Download,
   BarChart3
 } from 'lucide-react';
-import { useMaterialPriceHistory } from '@compartido/hooks/useMaterialsHook';
+import { useMaterialPriceHistory } from '@compartido/hooks/useMateriales';
 
 const MaterialPriceHistoryModal = ({ material, onClose }) => {
   const [selectedPlant, setSelectedPlant] = useState('all');

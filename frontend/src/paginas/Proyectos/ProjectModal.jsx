@@ -21,7 +21,7 @@ import {
   Users,
   AlertCircle
 } from 'lucide-react';
-import { useClientes as useCustomers } from '@compartido/hooks';
+import { useCustomers } from '@compartido/hooks';
 
 // Estados disponibles para proyectos
 const PROJECT_STATUSES = [

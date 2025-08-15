@@ -19,7 +19,7 @@ import {
   Activity
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useTablero as useDashboard } from '@compartido/hooks';
+import { useDashboard } from '@compartido/hooks';
 import { useState } from 'react';
 
 const Dashboard = () => {

@@ -6,8 +6,8 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import apiService from '../services/api';
-import { useNotifications } from './useNotifications';
+import api from '../servicios/api';
+import { useNotifications } from './useNotificaciones';
 
 // Query keys
 const QUERY_KEYS = {

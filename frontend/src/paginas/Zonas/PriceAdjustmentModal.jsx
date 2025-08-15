@@ -6,7 +6,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { FormModal } from '../../shared/components/modals';
+import { FormModal } from '@compartido/componentes/modals';
 import { 
   Percent, 
   DollarSign, 
@@ -22,7 +22,7 @@ import {
 import { 
   useZones, 
   useApplyPriceAdjustment 
-} from '../../shared/hooks/useZonesHook';
+} from '@compartido/hooks/useZonas';
 
 const PriceAdjustmentModal = ({ 
   isOpen, 

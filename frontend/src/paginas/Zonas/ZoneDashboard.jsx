@@ -24,7 +24,7 @@ import {
   Filter,
   RefreshCw
 } from 'lucide-react';
-import { useZoneMetrics, useZonesStats } from '@shared/hooks/useZonesHook';
+import { useZoneMetrics, useZonesStats } from '@compartido/hooks/useZonas';
 
 const ZoneDashboard = ({ selectedZoneId = null, onZoneSelect, className = '' }) => {
   const [timeRange, setTimeRange] = useState('month'); // 'week', 'month', 'quarter', 'year'

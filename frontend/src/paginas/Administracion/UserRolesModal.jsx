@@ -18,7 +18,7 @@ import {
   Key
 } from 'lucide-react';
 import useAdminHook from '@compartido/hooks/useAdminHook';
-import { assignRoleToUser as assignSvc } from '@compartido/services/admin.service.js';
+import { assignRoleToUser as assignSvc } from '@compartido/servicios/servicioAdmin.js';
 
 const UserRolesModal = ({ 
   user = null, 

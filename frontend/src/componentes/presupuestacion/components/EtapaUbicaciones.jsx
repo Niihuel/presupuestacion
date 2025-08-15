@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { MapPin, Navigation, Building2, DollarSign } from 'lucide-react';
 import { zoneService, projectService, quotationService } from '@compartido/servicios';
-import api from '@compartido/services/api';
+import api from '@compartido/servicios/api';
 
 const EtapaUbicaciones = ({ data, onChange }) => {
   const [distanceKm, setDistanceKm] = useState(data?.distance_km || data?.distance_from_cba || 0);

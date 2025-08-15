@@ -5,10 +5,10 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { quotationService } from '../services';
-import { useNotifications } from './useNotifications';
-import { calcularPresupuesto, DEFAULT_INDICES, DEFAULT_TARIFAS } from '../services';
-import { unitsPerTruck } from '../utils/packing';
+import { quotationService } from '../servicios';
+import { useNotifications } from './useNotificaciones';
+import { calcularPresupuesto, DEFAULT_INDICES, DEFAULT_TARIFAS } from '../servicios';
+import { unitsPerTruck } from '../utilidades/empaque';
 
 export const usePresupuestacionWizard = (id = null) => {
   const queryClient = useQueryClient();

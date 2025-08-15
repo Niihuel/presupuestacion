@@ -23,7 +23,7 @@ import { es } from 'date-fns/locale';
 import usePiezas from '@compartido/hooks/usePiezas';
 import useZonas from '@compartido/hooks/useZonas';
 import useMateriales from '@compartido/hooks/useMateriales';
-import { useFormulaMaterialPieza as usePieceMaterialFormula } from '@compartido/hooks';
+import { usePieceMaterialFormula } from '@compartido/hooks';
 import LoadingSpinner from '@compartido/componentes/CargandoSpinner.jsx';
 import { pieceService } from '@compartido/servicios';
 

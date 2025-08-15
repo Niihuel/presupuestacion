@@ -33,7 +33,7 @@ import {
   useDeleteProject,
   PROJECT_STATUSES 
 } from '@compartido/hooks/useProyectos';
-import { useClientes as useCustomers } from '@compartido/hooks';
+import { useCustomers } from '@compartido/hooks';
 
 // Componentes
 import ProjectModal from '@componentes/proyectos/components/ProjectModal.jsx';

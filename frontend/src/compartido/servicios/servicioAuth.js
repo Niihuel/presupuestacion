@@ -1,5 +1,5 @@
 import api from './api';
-import { manejarErrorApi as handleApiError } from '../utilidades/manejarErrorApi';
+import { handleApiError } from '../utilidades/manejarErrorApi';
 
 class AuthService {
   async login(credentials) {

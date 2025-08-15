@@ -24,7 +24,7 @@ import {
   Trash2
 } from 'lucide-react';
 
-import { usePiezas as usePiecePrices } from '@compartido/hooks';
+import { usePiecePrices } from '@compartido/hooks';
 
 const PieceViewModal = ({ isOpen, onClose, piece = null, onEdit, onDelete }) => {
   const [activeTab, setActiveTab] = useState('details');

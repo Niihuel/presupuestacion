@@ -1,16 +1,51 @@
 // Índice de Hooks Compartidos (unificado)
 
-export { default as useAutenticacion } from './useAutenticacion.js';
+export * from './useAutenticacion.js';
 export { default as useNotificaciones } from './useNotificaciones.js';
-export { default as usePiezas } from './usePiezas.js';
-export { default as useZonas } from './useZonas.js';
-export { default as useMateriales } from './useMateriales.js';
-export { default as useClientes } from './useClientes.js';
-export { default as useProyectos } from './useProyectos.js';
-export { default as useTablero } from './useTablero.js';
+export * from './usePiezas.js';
+export * from './useZonas.js';
+// Reexportes selectivos desde useMateriales (evitar conflicto con usePieceMaterialFormula)
+export {
+	useMaterials,
+	useMaterial,
+	useMaterialsStats,
+	useMaterialPriceHistory,
+	useMaterialStockByPlant,
+	useCreateMaterial,
+	useUpdateMaterial,
+	useDeleteMaterial,
+	useUpdateMaterialStock,
+	useUpdateMaterialPrice,
+	useImportMaterials,
+	useExportMaterials,
+	useMaterialsForPiece,
+	useUpdatePieceMaterialFormula
+} from './useMateriales.js';
+export {
+	useCustomers,
+	useCustomer,
+	useCreateCustomer,
+	useUpdateCustomer,
+	useDeleteCustomer,
+	useSearchCustomers,
+	useCustomersStats
+} from './useClientes.js';
+export {
+	useProjects,
+	useProject,
+	useCreateProject,
+	useUpdateProject,
+	useDeleteProject,
+	useProjectsStats
+} from './useProyectos.js';
+export {
+	useDashboard,
+	useDashboardStats,
+	useDashboardHasData
+} from './useTablero.js';
 export { default as useAdminHook } from './useAdminHook.js';
-export { default as useCotizaciones } from './useCotizaciones.js';
-export { default as useFormulaMaterialPieza } from './useFormulaMaterialPieza.js';
+export * from './useCotizaciones.js';
+export * from './useFormulaMaterialPieza.js';
 export { default as useWizardPresupuestacion } from './useWizardPresupuestacion.js';
 export { default as usePlantasHook } from './usePlantasHook.js';
 export { default as useCalculistasHook } from './useCalculistasHook.js';

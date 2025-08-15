@@ -8,7 +8,7 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
-import pieceService from '../services/piece.service.js';
+import { pieceService } from '../servicios';
 
 /**
  * Hook para búsqueda de piezas con filtros

@@ -9,8 +9,8 @@ const rutasSistema = require('../modules/system');
 const { routes: rutasMateriales } = require('../modules/materials');
 const rutasAdmin = require('../modules/admin');
 const { routes: rutasLogistica } = require('../modules/logistics');
-const rutasCalculistas = require('../routes/calculista.routes');
-const rutasPlantas = require('../routes/planta.routes');
+const { routes: rutasCalculistas } = require('../modules/calculistas');
+const { routes: rutasPlantas } = require('../modules/plantas');
 
 module.exports = {
 	rutasAuth,

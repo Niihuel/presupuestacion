@@ -1,4 +1,5 @@
 // src/config/server.js
+require('module-alias/register');
 require('dotenv').config();
 const express = require('express');
 const helmet = require('helmet');
@@ -12,12 +13,22 @@ const { connectDB } = require('../shared/database/database');
 const { logger } = require('../shared/utils/logger');
 const { errorHandler } = require('../shared/middleware/error.handler');
 
-// Import routes from modules
-const { authRoutes, quotationRoutes, zoneRoutes, customerRoutes, projectRoutes, pieceRoutes, dashboardRoutes, systemRoutes, materialRoutes, adminRoutes, logisticsRoutes } = require('../modules');
-
-// Import individual routes
-const calculistaRoutes = require('../routes/calculista.routes');
-const plantasRoutes = require('../routes/planta.routes');
+// Import routes desde agregador en español, mapeando a nombres actuales
+const {
+	rutasAuth: authRoutes,
+	rutasCotizaciones: quotationRoutes,
+	rutasZonas: zoneRoutes,
+	rutasClientes: customerRoutes,
+	rutasProyectos: projectRoutes,
+	rutasPiezas: pieceRoutes,
+	rutasTablero: dashboardRoutes,
+	rutasSistema: systemRoutes,
+	rutasMateriales: materialRoutes,
+	rutasAdmin: adminRoutes,
+	rutasLogistica: logisticsRoutes,
+	rutasCalculistas: calculistaRoutes,
+	rutasPlantas: plantasRoutes
+} = require('../modulos');
 
 // Import passport strategies  
 require('../modules/auth/passport');

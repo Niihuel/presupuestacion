@@ -325,3 +325,36 @@ BEGIN CATCH
 	THROW;
 END CATCH;
 */
+
+-- =====================================================
+-- ELIMINACIÓN SEGURA DE CAMPOS NO USADOS (PIEZAS)
+-- Ejecuta esta sección si ya actualizaste el código para no depender de ellos
+-- =====================================================
+BEGIN TRY
+	BEGIN TRAN;
+	IF COL_LENGTH('dbo.pieces','section') IS NOT NULL ALTER TABLE dbo.pieces DROP COLUMN section;
+	IF COL_LENGTH('dbo.pieces','seismic_zone') IS NOT NULL ALTER TABLE dbo.pieces DROP COLUMN seismic_zone;
+	IF COL_LENGTH('dbo.pieces','concrete_code') IS NOT NULL ALTER TABLE dbo.pieces DROP COLUMN concrete_code;
+	IF COL_LENGTH('dbo.pieces','wind_pressure') IS NOT NULL ALTER TABLE dbo.pieces DROP COLUMN wind_pressure;
+	IF COL_LENGTH('dbo.pieces','length_from') IS NOT NULL ALTER TABLE dbo.pieces DROP COLUMN length_from;
+	IF COL_LENGTH('dbo.pieces','length_to') IS NOT NULL ALTER TABLE dbo.pieces DROP COLUMN length_to;
+	IF COL_LENGTH('dbo.pieces','units_per_truck') IS NOT NULL ALTER TABLE dbo.pieces DROP COLUMN units_per_truck;
+	IF COL_LENGTH('dbo.pieces','is_roof_surface') IS NOT NULL ALTER TABLE dbo.pieces DROP COLUMN is_roof_surface;
+	IF COL_LENGTH('dbo.pieces','is_floor_surface') IS NOT NULL ALTER TABLE dbo.pieces DROP COLUMN is_floor_surface;
+	IF COL_LENGTH('dbo.pieces','is_prestressed') IS NOT NULL ALTER TABLE dbo.pieces DROP COLUMN is_prestressed;
+	IF COL_LENGTH('dbo.pieces','is_enclosure') IS NOT NULL ALTER TABLE dbo.pieces DROP COLUMN is_enclosure;
+	IF COL_LENGTH('dbo.pieces','allows_optional') IS NOT NULL ALTER TABLE dbo.pieces DROP COLUMN allows_optional;
+	IF COL_LENGTH('dbo.pieces','is_individual') IS NOT NULL ALTER TABLE dbo.pieces DROP COLUMN is_individual;
+	IF COL_LENGTH('dbo.pieces','is_surface') IS NOT NULL ALTER TABLE dbo.pieces DROP COLUMN is_surface;
+	IF COL_LENGTH('dbo.pieces','requires_index_sheet') IS NOT NULL ALTER TABLE dbo.pieces DROP COLUMN requires_index_sheet;
+	IF COL_LENGTH('dbo.pieces','drawing_name') IS NOT NULL ALTER TABLE dbo.pieces DROP COLUMN drawing_name;
+	IF COL_LENGTH('dbo.pieces','can_quote') IS NOT NULL ALTER TABLE dbo.pieces DROP COLUMN can_quote;
+	IF COL_LENGTH('dbo.pieces','formula_coefficient') IS NOT NULL ALTER TABLE dbo.pieces DROP COLUMN formula_coefficient;
+	IF COL_LENGTH('dbo.pieces','global_coefficient') IS NOT NULL ALTER TABLE dbo.pieces DROP COLUMN global_coefficient;
+	COMMIT TRAN;
+END TRY
+BEGIN CATCH
+	IF @@TRANCOUNT > 0 ROLLBACK TRAN;
+	THROW;
+END CATCH;
+GO

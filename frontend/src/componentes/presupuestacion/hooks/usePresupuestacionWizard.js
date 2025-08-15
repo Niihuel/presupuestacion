@@ -189,7 +189,7 @@ export const usePresupuestacionWizard = (id = null) => {
 
       const entrada = {
         fechaPreciosBase: formData.price_date || new Date().toISOString().slice(0,10),
-        indices: DEFAULT_INDICES,
+        indices: { general: 1.0, especial: 1.0 },
         parametros,
         ajustesMateriales: {
           porcentajeComercial: Number(formData.materials_commercial_adj || 0) || 0,

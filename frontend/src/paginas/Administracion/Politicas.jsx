@@ -56,7 +56,7 @@ const Politicas = () => {
   const loadPolicies = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/policies');
+      const response = await fetch('/api/v1/system/config');
       if (response.ok) {
         const data = await response.json();
         setPolicies(data.data || data);
@@ -75,7 +75,7 @@ const Politicas = () => {
     setMessage(null);
     
     try {
-      const response = await fetch('/api/policies', {
+      const response = await fetch('/api/v1/system/config', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(policies)

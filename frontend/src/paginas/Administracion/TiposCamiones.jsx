@@ -61,9 +61,9 @@ const TruckTypes = () => {
     setLoading(true);
     try {
       const [trucksRes, rulesRes, familiesRes] = await Promise.all([
-        fetch('/api/truck-types'),
-        fetch('/api/packing-rules'),
-        fetch('/api/piece-families')
+        fetch('/api/v1/truck-types'),
+        fetch('/api/v1/packing-rules'),
+        fetch('/api/v1/piece-families')
       ]);
       
       if (trucksRes.ok) {
@@ -129,8 +129,8 @@ const TruckTypes = () => {
     
     try {
       const url = editingRule 
-        ? `/api/packing-rules/${editingRule.id}`
-        : '/api/packing-rules';
+        ? `/api/v1/packing-rules/${editingRule.id}`
+        : '/api/v1/packing-rules';
       
       const response = await fetch(url, {
         method: editingRule ? 'PUT' : 'POST',

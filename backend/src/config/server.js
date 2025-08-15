@@ -13,7 +13,7 @@ const { logger } = require('../shared/utils/logger');
 const { errorHandler } = require('../shared/middleware/error.handler');
 
 // Import routes from modules
-const { authRoutes, quotationRoutes, zoneRoutes, customerRoutes, projectRoutes, pieceRoutes, dashboardRoutes, systemRoutes, materialRoutes, adminRoutes } = require('../modules');
+const { authRoutes, quotationRoutes, zoneRoutes, customerRoutes, projectRoutes, pieceRoutes, dashboardRoutes, systemRoutes, materialRoutes, adminRoutes, logisticsRoutes } = require('../modules');
 
 // Import individual routes
 const calculistaRoutes = require('../routes/calculista.routes');
@@ -187,6 +187,8 @@ app.use('/api/v1/calculistas', calculistaRoutes);
 app.use('/api/v1/materials', materialRoutes);
 app.use('/api/v1', systemRoutes);
 app.use('/api/v1/admin', adminRoutes);
+app.use('/api/v1', logisticsRoutes);
+
 
 // Ruta temporal para testing de clientes
 app.use('/api/v1/customers-test', require('../modules/customers/routes/customer.test.routes'));

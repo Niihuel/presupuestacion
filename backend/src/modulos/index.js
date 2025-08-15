@@ -11,6 +11,8 @@ const rutasAdmin = require('../modules/admin');
 const { routes: rutasLogistica } = require('../modules/logistics');
 const { routes: rutasCalculistas } = require('../modules/calculistas');
 const { routes: rutasPlantas } = require('../modules/plantas');
+const { routes: rutasPoliticas } = require('../modules/politicas');
+const { routes: rutasTiposCamion } = require('../modules/tiposCamion');
 
 module.exports = {
 	rutasAuth,
@@ -25,5 +27,7 @@ module.exports = {
 	rutasAdmin,
 	rutasLogistica,
 	rutasCalculistas,
-	rutasPlantas
+	rutasPlantas,
+	rutasPoliticas,
+	rutasTiposCamion
 };

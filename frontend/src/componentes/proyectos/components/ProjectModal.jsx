@@ -11,7 +11,7 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { X, Building, Calendar, MapPin, User, Save, Loader2, RefreshCw } from 'lucide-react';
-import projectService from '@compartido/services/project.service';
+import { projectService } from '@compartido/servicios';
 
 const PROJECT_TYPES = [
   'Residencial',

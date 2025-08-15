@@ -38,8 +38,8 @@ import { useCustomers } from '@compartido/hooks/useCustomersHook';
 // Componentes
 import ProjectModal from '@componentes/projects/components/ProjectModal';
 import ProjectViewModal from './ProjectViewModal';
-import DeleteConfirmModal from '@compartido/components/DeleteConfirmModal';
-import { useNotifications } from '@compartido/hooks/useNotifications';
+import DeleteConfirmModal from '@compartido/componentes/ModalConfirmarEliminar.jsx';
+import { useNotifications } from '@compartido/hooks/useNotificaciones';
 
 const Proyectos = () => {
   // Estados locales

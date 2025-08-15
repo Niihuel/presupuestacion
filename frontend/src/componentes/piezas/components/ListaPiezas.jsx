@@ -24,9 +24,13 @@ import { usePieces, useDeletePiece } from '@compartido/hooks/usePiecesHook';
 import PieceCard from './PieceCard';
 // Importar el modal desde el mismo directorio para evitar rutas incorrectas
 import PieceModalComplete from './PieceModalComplete';
-import DeleteConfirmModal from '@compartido/components/DeleteConfirmModal';
-import LoadingSpinner from '@compartido/components/LoadingSpinner';
-import Paginacion from '@compartido/components/Paginacion';
+<<<<<<< Current (Your changes)
+import { DialogoConfirmacion as DeleteConfirmModal, LoadingSpinner, Paginacion } from '@compartido/components';
+=======
+import DeleteConfirmModal from '@compartido/componentes/ModalConfirmarEliminar.jsx';
+import LoadingSpinner from '@compartido/componentes/CargandoSpinner.jsx';
+import Paginacion from '@compartido/componentes/Paginacion.jsx';
+>>>>>>> Incoming (Background Agent changes)
 
 const PiecesList = () => {
   // Estados locales

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { customerService } from '@compartido/services';
+import { customerService } from '@compartido/servicios';
 import { Search, Check, ChevronLeft, ChevronRight, User } from 'lucide-react';
 
 const CustomerSelectorTable = ({ value = '', onChange, className = '' }) => {

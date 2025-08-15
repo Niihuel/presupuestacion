@@ -7,9 +7,9 @@
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
 import { useAuthStore } from '@nucleo/store/auth.store';
-import { authService } from '@compartido/services';
-import CampoContrasena from '@compartido/components/CampoContrasena';
-import { useNotifications } from '@compartido/hooks/useNotifications';
+import { authService } from '@compartido/servicios';
+import { CampoContrasena } from '@compartido/componentes';
+import { useNotifications } from '@compartido/hooks/useNotificaciones';
 
 const ChangePasswordPage = () => {
   const { register, handleSubmit, formState: { errors }, watch } = useForm();

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { MapPin, Navigation, Building2, DollarSign } from 'lucide-react';
-import { zoneService, projectService, quotationService } from '@compartido/services';
+import { zoneService, projectService, quotationService } from '@compartido/servicios';
 import api from '@compartido/services/api';
 
 const EtapaUbicaciones = ({ data, onChange }) => {

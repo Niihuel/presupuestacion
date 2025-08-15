@@ -30,8 +30,13 @@ import {
   Search
 } from 'lucide-react';
 
+<<<<<<< Current (Your changes)
 import { quotationService } from '@compartido/services';
-import { useNotifications } from '@compartido/hooks/useNotifications';
+import { useNotificaciones as useNotifications } from '@compartido/hooks';
+=======
+import { quotationService } from '@compartido/servicios';
+import { useNotifications } from '@compartido/hooks/useNotificaciones';
+>>>>>>> Incoming (Background Agent changes)
 
 const KanbanPresupuestos = () => {
   const navigate = useNavigate();

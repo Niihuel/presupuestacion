@@ -5,8 +5,8 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { quotationService, calcularPresupuesto, DEFAULT_INDICES, DEFAULT_TARIFAS, precioBasePorUM, unitsPerTruck } from '@compartido/services';
-import { useNotifications } from '@compartido/hooks/useNotifications';
+import { quotationService, calcularPresupuesto, DEFAULT_INDICES, DEFAULT_TARIFAS, precioBasePorUM, unitsPerTruck } from '@compartido/servicios';
+import { useNotifications } from '@compartido/hooks/useNotificaciones';
 
 export const usePresupuestacionWizard = (id = null) => {
   const queryClient = useQueryClient();
@@ -189,7 +189,7 @@ export const usePresupuestacionWizard = (id = null) => {
 
       const entrada = {
         fechaPreciosBase: formData.price_date || new Date().toISOString().slice(0,10),
-        indices: DEFAULT_INDICES,
+        indices: { general: 1.0, especial: 1.0 },
         parametros,
         ajustesMateriales: {
           porcentajeComercial: Number(formData.materials_commercial_adj || 0) || 0,

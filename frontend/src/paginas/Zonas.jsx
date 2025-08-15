@@ -47,7 +47,7 @@ import ZoneMap from '@paginas/Zonas/ZoneMap.jsx';
 import ZoneDashboard from '@paginas/Zonas/ZoneDashboard.jsx';
 import ZoneModal from '@paginas/Zonas/ZoneModal.jsx';
 import ZoneViewModal from '@paginas/Zonas/ZoneViewModal.jsx';
-import DialogoConfirmacion from '@compartido/components/DialogoConfirmacion.jsx';
+import DialogoConfirmacion from '@compartido/componentes/DialogoConfirmacion.jsx';
 import ZoneDeleteModal from '../features/zones/components/ZoneDeleteModal';
 import PriceCopyModal from './Zonas/PriceCopyModal.jsx';
 

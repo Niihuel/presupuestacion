@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { pieceService } from '@compartido/services'
+import { pieceService } from '@compartido/servicios'
 import { DollarSign, RefreshCw, Save, Calendar, Factory, Calculator, Download, FileText } from 'lucide-react'
 import jsPDF from 'jspdf'
 import 'jspdf-autotable'
+import { AdminShell, AdminToolbar, AdminCard, AdminToast } from '@compartido/componentes/AdminUI'
 
 export default function PiecePrices() {
   const qc = useQueryClient()
@@ -49,7 +50,7 @@ export default function PiecePrices() {
     if (!res) return
     const doc = new jsPDF({ orientation: 'p', unit: 'pt', format: 'a4' })
     doc.setFontSize(12)
-    doc.text('Precio de Pieza (TVF v1)', 40, 40)
+    doc.text('Publicación de Precios - Pieza', 40, 40)
     doc.setFontSize(9)
     doc.text(`Pieza: ${pieceId}  Zona: ${zoneId}  Fecha: ${asOf}`, 40, 58)
     doc.autoTable({
@@ -59,50 +60,61 @@ export default function PiecePrices() {
     })
     doc.save(`pieza_${pieceId}_zona_${zoneId}_${asOf}.pdf`)
   }
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold flex items-center gap-2"><DollarSign className="w-4 h-4"/> Precios de Piezas (TVF v1)</h2>
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1">
-            <Factory className="w-4 h-4"/>
-            <input type="number" min="1" value={zoneId} onChange={e => setZoneId(e.target.value)} className="w-20 px-2 py-1 border rounded"/>
-          </div>
-          <div className="flex items-center gap-1">
-            <Calendar className="w-4 h-4"/>
-            <input type="date" value={asOf} onChange={e => setAsOf(e.target.value)} className="px-2 py-1 border rounded"/>
-          </div>
-          <div className="flex items-center gap-1">
-            <Calculator className="w-4 h-4"/>
-            <input type="number" min="1" placeholder="pieceId" value={pieceId} onChange={e => setPieceId(e.target.value)} className="w-28 px-2 py-1 border rounded"/>
-          </div>
-          <button onClick={handleCalculate} className="px-3 py-2 border rounded flex items-center gap-2"><RefreshCw className="w-4 h-4"/> Calcular</button>
-        </div>
-      </div>
 
-      <div className="bg-white border rounded p-4">
+  return (
+    <AdminShell title="Publicación de Precios" subtitle="Calcular y publicar precios mensuales por pieza">
+      <AdminToolbar>
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-2">
+            <Factory className="w-4 h-4 text-gray-500"/>
+            <input aria-label="Zona" type="number" min="1" value={zoneId} onChange={e => setZoneId(e.target.value)} className="w-24 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"/>
+          </div>
+          <div className="flex items-center gap-2">
+            <Calendar className="w-4 h-4 text-gray-500"/>
+            <input aria-label="Fecha base" type="date" value={asOf} onChange={e => setAsOf(e.target.value)} className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"/>
+          </div>
+          <div className="flex items-center gap-2">
+            <Calculator className="w-4 h-4 text-gray-500"/>
+            <input aria-label="ID Pieza" type="number" min="1" placeholder="ID de pieza" value={pieceId} onChange={e => setPieceId(e.target.value)} className="w-40 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"/>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <button onClick={handleCalculate} className="inline-flex items-center px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"><RefreshCw className="w-4 h-4 mr-2"/> Calcular</button>
+        </div>
+      </AdminToolbar>
+
+      <AdminCard title="Desglose calculado" description="Precio por UM desde servidor">
         {calcQuery.isLoading ? (
-          <div className="text-sm text-gray-500">Calculando...</div>
+          <div className="animate-pulse space-y-2">
+            <div className="h-10 bg-gray-100 rounded" />
+            <div className="h-10 bg-gray-100 rounded" />
+          </div>
         ) : !res ? (
           <div className="text-sm text-gray-500">Ingrese pieza/zona/fecha y calcule.</div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
             <div><span className="text-gray-500">Materiales:</span> <span className="font-medium">{res.materiales?.toLocaleString?.('es-AR',{style:'currency',currency:'ARS'}) ?? res.materiales}</span></div>
-            <div><span className="text-gray-500">Proceso_por_tn:</span> <span className="font-medium">{res.proceso_por_tn}</span></div>
+            <div><span className="text-gray-500">Proceso/tn:</span> <span className="font-medium">{res.proceso_por_tn}</span></div>
             <div><span className="text-gray-500">MO Hormigón:</span> <span className="font-medium">{res.mano_obra_hormigon}</span></div>
             <div><span className="text-gray-500">MO Acero:</span> <span className="font-medium">{res.mano_obra_acero}</span></div>
             <div className="md:col-span-2 border-t pt-2"><span className="text-gray-500">Total (base):</span> <span className="font-semibold">{res.total?.toLocaleString?.('es-AR',{style:'currency',currency:'ARS'}) ?? res.total}</span></div>
           </div>
         )}
-      </div>
+      </AdminCard>
 
-      <div className="flex items-center justify-end gap-2">
-        <button onClick={exportCSV} disabled={!res} className="px-3 py-2 border rounded flex items-center gap-2"><Download className="w-4 h-4"/> CSV</button>
-        <button onClick={exportPDF} disabled={!res} className="px-3 py-2 border rounded flex items-center gap-2"><FileText className="w-4 h-4"/> PDF</button>
-        <input type="date" value={effectiveDate} onChange={e => setEffectiveDate(e.target.value)} className="px-2 py-1 border rounded"/>
-        <button disabled={!res} onClick={handlePublish} className="px-4 py-2 bg-blue-600 text-white rounded flex items-center gap-2"><Save className="w-4 h-4"/> Publicar</button>
-      </div>
-    </div>
+      <AdminCard title="Publicación" description="Exportar y publicar precio del período">
+        <div className="flex flex-wrap items-center gap-2 justify-end">
+          <button onClick={exportCSV} disabled={!res} className="px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50 flex items-center gap-2"><Download className="w-4 h-4"/> CSV</button>
+          <button onClick={exportPDF} disabled={!res} className="px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50 flex items-center gap-2"><FileText className="w-4 h-4"/> PDF</button>
+          <input aria-label="Fecha efectiva" type="date" value={effectiveDate} onChange={e => setEffectiveDate(e.target.value)} className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"/>
+          <button disabled={!res} onClick={handlePublish} className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center gap-2"><Save className="w-4 h-4"/> Publicar</button>
+        </div>
+      </AdminCard>
+
+      {(publishMutation.isError || calcQuery.isError) && (
+        <AdminToast type="error" title="Error" description="Hubo un problema al procesar la solicitud" />
+      )}
+    </AdminShell>
   )
 }
 

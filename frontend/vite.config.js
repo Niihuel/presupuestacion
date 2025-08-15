@@ -10,6 +10,9 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
       '@paginas': path.resolve(__dirname, './src/paginas'),
       '@componentes': path.resolve(__dirname, './src/componentes'),
+      // Aliases específicos primero (prioridad)
+      '@compartido/components': path.resolve(__dirname, './src/compartido/componentes'),
+      '@shared/components': path.resolve(__dirname, './src/compartido/componentes'),
       '@compartido': path.resolve(__dirname, './src/compartido'),
       '@nucleo': path.resolve(__dirname, './src/nucleo'),
       '@recursos': path.resolve(__dirname, './src/recursos'),

@@ -33,8 +33,8 @@ import {
 } from 'lucide-react';
 
 // Hooks y servicios
-import { useSystemConfig, useUpdateSystemConfig } from '@shared/hooks/useSystemConfigHook';
-import { useNotifications } from '../shared/hooks/useNotifications';
+import { useSystemConfig, useUpdateSystemConfig } from '@compartido/hooks/useConfigSistema';
+import { useNotifications } from '@compartido/hooks/useNotificaciones';
 
 const Configuracion = () => {
   // Estados locales

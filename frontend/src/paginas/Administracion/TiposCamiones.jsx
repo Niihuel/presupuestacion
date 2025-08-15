@@ -13,7 +13,7 @@ import {
   AlertCircle, CheckCircle, Info, Layers, Calculator,
   ChevronDown, ChevronUp
 } from 'lucide-react';
-import { roundWeight, ceilTrips } from '@compartido/utils/rounding';
+import { roundWeight, ceilTrips } from '@compartido/utilidades/redondeo.js';
 
 const TruckTypes = () => {
   const [loading, setLoading] = useState(false);
@@ -61,9 +61,9 @@ const TruckTypes = () => {
     setLoading(true);
     try {
       const [trucksRes, rulesRes, familiesRes] = await Promise.all([
-        fetch('/api/truck-types'),
-        fetch('/api/packing-rules'),
-        fetch('/api/piece-families')
+        fetch('/api/v1/truck-types'),
+        fetch('/api/v1/packing-rules'),
+        fetch('/api/v1/piece-families')
       ]);
       
       if (trucksRes.ok) {
@@ -95,8 +95,8 @@ const TruckTypes = () => {
     
     try {
       const url = editingTruck 
-        ? `/api/truck-types/${editingTruck.id}`
-        : '/api/truck-types';
+        ? `/api/v1/truck-types/${editingTruck.id}`
+        : '/api/v1/truck-types';
       
       const response = await fetch(url, {
         method: editingTruck ? 'PUT' : 'POST',
@@ -129,8 +129,8 @@ const TruckTypes = () => {
     
     try {
       const url = editingRule 
-        ? `/api/packing-rules/${editingRule.id}`
-        : '/api/packing-rules';
+        ? `/api/v1/packing-rules/${editingRule.id}`
+        : '/api/v1/packing-rules';
       
       const response = await fetch(url, {
         method: editingRule ? 'PUT' : 'POST',
@@ -161,7 +161,7 @@ const TruckTypes = () => {
     if (!confirm('¿Está seguro de eliminar este camión?')) return;
     
     try {
-      const response = await fetch(`/api/truck-types/${id}`, {
+      const response = await fetch(`/api/v1/truck-types/${id}`, {
         method: 'DELETE'
       });
       

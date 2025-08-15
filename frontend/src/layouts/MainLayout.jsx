@@ -11,7 +11,7 @@
  */
 
 import { Outlet } from 'react-router-dom';
-import { EncabezadoNavegacion } from '@compartido/components';
+import { EncabezadoNavegacion } from '@compartido/componentes';
 
 const MainLayout = () => {
   return (

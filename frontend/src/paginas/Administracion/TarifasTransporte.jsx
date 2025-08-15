@@ -14,7 +14,7 @@ import {
   AlertCircle, CheckCircle, Calendar, MapPin,
   DollarSign, Route, ChevronDown, ChevronUp
 } from 'lucide-react';
-import { roundMoney } from '@compartido/utils/rounding';
+import { roundMoney } from '@compartido/utilidades/redondeo.js';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -62,7 +62,7 @@ const TransportTariffs = () => {
     setLoading(true);
     try {
       const [tariffsRes, zonesRes] = await Promise.all([
-        fetch('/api/transport-tariffs'),
+        fetch('/api/v1/transport-tariffs'),
         fetch('/api/zones')
       ]);
       
@@ -90,8 +90,8 @@ const TransportTariffs = () => {
     
     try {
       const url = editingTariff 
-        ? `/api/transport-tariffs/${editingTariff.id}`
-        : '/api/transport-tariffs';
+        ? `/api/v1/transport-tariffs/${editingTariff.id}`
+        : '/api/v1/transport-tariffs';
       
       const response = await fetch(url, {
         method: editingTariff ? 'PUT' : 'POST',
@@ -122,7 +122,7 @@ const TransportTariffs = () => {
     if (!confirm('¿Está seguro de eliminar esta tarifa?')) return;
     
     try {
-      const response = await fetch(`/api/transport-tariffs/${id}`, {
+      const response = await fetch(`/api/v1/transport-tariffs/${id}`, {
         method: 'DELETE'
       });
       
@@ -147,7 +147,7 @@ const TransportTariffs = () => {
     prevMonth.setMonth(prevMonth.getMonth() - 1);
     
     try {
-      const response = await fetch('/api/transport-tariffs/copy', {
+      const response = await fetch('/api/v1/transport-tariffs/copy', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

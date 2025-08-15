@@ -1,9 +1,15 @@
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
+<<<<<<< Current (Your changes)
 import { authService } from '@compartido/services';
-import { useNotifications } from '@compartido/hooks/useNotifications';
-import LoadingState from '@compartido/components/LoadingState';
+import { useNotificaciones as useNotifications } from '@compartido/hooks';
+import LoadingState from '@compartido/components';
+=======
+import { authService } from '@compartido/servicios';
+import { useNotifications } from '@compartido/hooks/useNotificaciones';
+import LoadingState from '@compartido/componentes/EstadoCargando.jsx';
+>>>>>>> Incoming (Background Agent changes)
 import paschiniIcon from '@recursos/images/paschini-icon.png';
 import pretensaIcon from '@recursos/images/pretensa-icon.png';
 

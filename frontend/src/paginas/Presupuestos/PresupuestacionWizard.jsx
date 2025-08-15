@@ -38,7 +38,11 @@ import { usePresupuestacionWizard } from '@componentes/presupuestacion/hooks/use
 import { useWizardNavigation } from '@componentes/presupuestacion/hooks/useWizardNavigation';
 
 // Hooks y servicios
-import { useNotifications } from '@compartido/hooks/useNotifications';
+<<<<<<< Current (Your changes)
+import { useNotificaciones as useNotifications } from '@compartido/hooks';
+=======
+import { useNotifications } from '@compartido/hooks/useNotificaciones';
+>>>>>>> Incoming (Background Agent changes)
 
 const ETAPAS = [
   { 

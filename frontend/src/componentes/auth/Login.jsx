@@ -13,9 +13,9 @@ import { useForm } from 'react-hook-form';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '@nucleo/store/auth.store';
-import { authService } from '@compartido/services';
+import { authService } from '@compartido/servicios';
 import { toast } from 'sonner';
-import CampoContrasena from '@compartido/components/CampoContrasena';
+import { CampoContrasena } from '@compartido/componentes';
 import paschiniIcon from '../../assets/images/paschini-icon.png';
 import pretensaIcon from '../../assets/images/pretensa-icon.png';
 

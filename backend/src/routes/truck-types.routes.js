@@ -1,16 +1,16 @@
 /**
- * Routes for managing truck types and packing rules
+ * Rutas para gestionar tipos de camión y reglas de empaque
  * 
  * Endpoints:
- * - GET /api/truck-types - Get all truck types
- * - POST /api/truck-types - Create truck type
- * - PUT /api/truck-types/:id - Update truck type
- * - DELETE /api/truck-types/:id - Delete truck type
- * - GET /api/packing-rules - Get packing rules
- * - POST /api/packing-rules - Create packing rule
- * - PUT /api/packing-rules/:id - Update packing rule
- * - DELETE /api/packing-rules/:id - Delete packing rule
- * - GET /api/piece-families - Get piece families
+ * - GET /api/truck-types - Obtener todos los tipos de camión
+ * - POST /api/truck-types - Crear tipo de camión
+ * - PUT /api/truck-types/:id - Actualizar tipo de camión
+ * - DELETE /api/truck-types/:id - Eliminar tipo de camión
+ * - GET /api/packing-rules - Obtener reglas de empaque
+ * - POST /api/packing-rules - Crear regla de empaque
+ * - PUT /api/packing-rules/:id - Actualizar regla de empaque
+ * - DELETE /api/packing-rules/:id - Eliminar regla de empaque
+ * - GET /api/piece-families - Obtener familias de piezas
  */
 
 const express = require('express');
@@ -22,7 +22,7 @@ const { AppError } = require('../utils/errors');
 const { catchAsync } = require('../utils/catchAsync');
 const { ApiResponse } = require('../utils/apiResponse');
 
-// Get all truck types
+// Obtener todos los tipos de camión
 router.get('/', authenticate, catchAsync(async (req, res) => {
   const query = `
     SELECT 
@@ -46,7 +46,7 @@ router.get('/', authenticate, catchAsync(async (req, res) => {
   res.json(ApiResponse.success(result));
 }));
 
-// Create truck type
+// Crear tipo de camión
 router.post('/',
   authenticate,
   authorize('admin'),
@@ -103,7 +103,7 @@ router.post('/',
   })
 );
 
-// Update truck type
+// Actualizar tipo de camión
 router.put('/:id',
   authenticate,
   authorize('admin'),
@@ -151,7 +151,7 @@ router.put('/:id',
   })
 );
 
-// Delete truck type
+// Eliminar tipo de camión
 router.delete('/:id',
   authenticate,
   authorize('admin'),
@@ -178,7 +178,7 @@ router.delete('/:id',
   })
 );
 
-// Get packing rules
+// Obtener reglas de empaque
 router.get('/packing-rules', authenticate, catchAsync(async (req, res) => {
   const query = `
     SELECT 
@@ -204,7 +204,7 @@ router.get('/packing-rules', authenticate, catchAsync(async (req, res) => {
   res.json(ApiResponse.success(result));
 }));
 
-// Create packing rule
+// Crear regla de empaque
 router.post('/packing-rules',
   authenticate,
   authorize('admin'),
@@ -265,7 +265,7 @@ router.post('/packing-rules',
   })
 );
 
-// Update packing rule
+// Actualizar regla de empaque
 router.put('/packing-rules/:id',
   authenticate,
   authorize('admin'),
@@ -304,7 +304,7 @@ router.put('/packing-rules/:id',
   })
 );
 
-// Delete packing rule
+// Eliminar regla de empaque
 router.delete('/packing-rules/:id',
   authenticate,
   authorize('admin'),
@@ -318,7 +318,7 @@ router.delete('/packing-rules/:id',
   })
 );
 
-// Get piece families
+// Obtener familias de piezas
 router.get('/piece-families', authenticate, catchAsync(async (req, res) => {
   const query = `
     SELECT 

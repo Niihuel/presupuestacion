@@ -19,6 +19,7 @@ const { routes: dashboardRoutes } = require('./dashboard');
 const systemRoutes = require('./system');
 const adminRoutes = require('./admin');
 const { routes: materialRoutes } = require('./materials');
+const { routes: logisticsRoutes } = require('./logistics');
 
 module.exports = {
   authRoutes,
@@ -30,5 +31,10 @@ module.exports = {
   dashboardRoutes,
   systemRoutes,
   materialRoutes,
+<<<<<<< Current (Your changes)
   adminRoutes
+=======
+  adminRoutes,
+  logisticsRoutes
+>>>>>>> Incoming (Background Agent changes)
 };

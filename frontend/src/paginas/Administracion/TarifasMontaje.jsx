@@ -14,7 +14,7 @@ import {
   AlertCircle, CheckCircle, Calendar, MapPin,
   DollarSign, Weight, Clock, Truck
 } from 'lucide-react';
-import { roundMoney, roundWeight } from '@compartido/utils/rounding';
+import { roundMoney, roundWeight } from '@compartido/utilidades/redondeo.js';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -64,7 +64,7 @@ const MountingTariffs = () => {
     setLoading(true);
     try {
       const [tariffsRes, zonesRes] = await Promise.all([
-        fetch('/api/mounting-tariffs'),
+        fetch('/api/v1/mounting-tariffs'),
         fetch('/api/zones')
       ]);
       
@@ -92,8 +92,8 @@ const MountingTariffs = () => {
     
     try {
       const url = editingTariff 
-        ? `/api/mounting-tariffs/${editingTariff.id}`
-        : '/api/mounting-tariffs';
+        ? `/api/v1/mounting-tariffs/${editingTariff.id}`
+        : '/api/v1/mounting-tariffs';
       
       const response = await fetch(url, {
         method: editingTariff ? 'PUT' : 'POST',
@@ -124,7 +124,7 @@ const MountingTariffs = () => {
     if (!confirm('¿Está seguro de eliminar esta tarifa?')) return;
     
     try {
-      const response = await fetch(`/api/mounting-tariffs/${id}`, {
+      const response = await fetch(`/api/v1/mounting-tariffs/${id}`, {
         method: 'DELETE'
       });
       
@@ -149,7 +149,7 @@ const MountingTariffs = () => {
     prevMonth.setMonth(prevMonth.getMonth() - 1);
     
     try {
-      const response = await fetch('/api/mounting-tariffs/copy', {
+      const response = await fetch('/api/v1/mounting-tariffs/copy', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

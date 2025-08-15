@@ -16,8 +16,8 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { pieceService, zoneService } from '@compartido/services';
-import { useNotifications } from '@compartido/hooks/useNotifications';
+import { pieceService, zoneService } from '@compartido/servicios';
+import { useNotifications } from '@compartido/hooks/useNotificaciones';
 
 const EtapaPiezasCantidadesV2 = ({ data, onChange, errors = {} }) => {
   const [localData, setLocalData] = useState({

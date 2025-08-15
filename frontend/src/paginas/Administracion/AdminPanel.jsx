@@ -8,15 +8,31 @@
 import { useMemo } from 'react';
 import { useSearchParams, NavLink } from 'react-router-dom';
 import { LayoutDashboard, Users, Shield, Settings, Package, Cog, ListTree, Percent, Truck, DollarSign, BarChart3 } from 'lucide-react';
-import MaterialsPrices from './MaterialsPrices';
-import ProcessParams from './ProcessParams';
+<<<<<<< Current (Your changes)
+import PreciosMateriales from './PreciosMateriales.jsx';
+import ParametrosProceso from './ParametrosProceso.jsx';
+import AdminDashboard from './AdminDashboard.jsx';
+import PreciosPiezas from './PreciosPiezas.jsx';
+import EditorBOM from './EditorBOM.jsx';
+import GestionUsuarios from './GestionUsuarios.jsx';
+import GestionRoles from './GestionRoles.jsx';
+import ConfiguracionSistema from './ConfiguracionSistema.jsx';
+import Comparativos from './Comparativos.jsx';
+=======
+import MaterialsPrices from './PreciosMateriales.jsx';
+import ProcessParams from './ParametrosProceso.jsx';
 import AdminDashboard from './AdminDashboard';
-import PiecePrices from './PiecePrices';
-import BOMEditor from './BOMEditor';
-import UserManagement from './UserManagement';
-import RoleManagement from './RoleManagement';
-import SystemConfig from './SystemConfig';
+import { AdminShell } from '@compartido/componentes/AdminUI';
+import PiecePrices from './PreciosPiezas.jsx';
+import BOMEditor from './EditorBOM.jsx';
+import UserManagement from './GestionUsuarios.jsx';
+import RoleManagement from './GestionRoles.jsx';
+import SystemConfig from './ConfiguracionSistema.jsx';
 import Comparativos from './Comparativos';
+import AdminPolicies from './AdminPolicies.jsx';
+import AdminTrucks from './AdminTrucks.jsx';
+import AdminTransportMounting from './AdminTransportMounting.jsx';
+>>>>>>> Incoming (Background Agent changes)
 
 const TABS = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -47,22 +63,25 @@ const AdminPanel = () => {
   const CurrentTab = useMemo(() => {
     switch (activeTab) {
       case 'users':
-        return <UserManagement />;
+        return <GestionUsuarios />;
       case 'roles':
-        return <RoleManagement />;
+        return <GestionRoles />;
       case 'config':
-        return <SystemConfig />;
+        return <ConfiguracionSistema />;
       case 'insumos':
-        return <MaterialsPrices />;
+        return <PreciosMateriales />;
       case 'parametros':
-        return <ProcessParams />;
+        return <ParametrosProceso />;
       case 'bom':
-        return <BOMEditor />;
+        return <EditorBOM />;
       case 'politicas':
+        return <AdminPolicies />;
       case 'camiones':
+        return <AdminTrucks />;
       case 'transporte':
+        return <AdminTransportMounting />;
       case 'precios':
-        return <PiecePrices />;
+        return <PreciosPiezas />;
       case 'comparativos':
         return <Comparativos />;
       case 'dashboard':
@@ -72,28 +91,33 @@ const AdminPanel = () => {
   }, [activeTab]);
 
   return (
-    <div className="space-y-6">
-      {/* Tabs */}
-      <div className="bg-white rounded-lg shadow p-2 flex items-center gap-2">
-        {TABS.map(({ id, label, icon: Icon }) => (
-          <button
-            key={id}
-            onClick={() => setTab(id)}
-            className={`inline-flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-              activeTab === id
-                ? 'bg-purple-100 text-purple-700'
-                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-            }`}
-          >
-            <Icon className="h-4 w-4 mr-2" />
-            {label}
-          </button>
-        ))}
+    <AdminShell
+      title="Administración"
+      subtitle="Gestione catálogos, parámetros y políticas del sistema"
+      actions={null}
+    >
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {TABS.map(({ id, label, icon: Icon }) => (
+            <button
+              key={id}
+              onClick={() => setTab(id)}
+              className={`inline-flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                activeTab === id
+                  ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                  : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50'
+              }`}
+              aria-pressed={activeTab === id}
+              aria-label={`Tab ${label}`}
+            >
+              <Icon className="h-4 w-4 mr-2" />
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
-
-      {/* Content */}
-      <div>{CurrentTab}</div>
-    </div>
+      <div className="mt-6">{CurrentTab}</div>
+    </AdminShell>
   );
 };
 

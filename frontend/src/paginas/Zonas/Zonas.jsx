@@ -50,7 +50,7 @@ import ZoneMap from './ZoneMap';
 import ZoneDashboard from './ZoneDashboard';
 import ZoneModal from './ZoneModal';
 import ZoneViewModal from './ZoneViewModal';
-import DialogoConfirmacion from '@compartido/components/DialogoConfirmacion';
+import DialogoConfirmacion from '@compartido/componentes/DialogoConfirmacion';
 import PriceCopyModal from './PriceCopyModal';
 
 const Zonas = () => {

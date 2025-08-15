@@ -9,7 +9,7 @@ import { useQuery } from '@tanstack/react-query';
 import { User, Building, Calendar, FileText, AlertCircle } from 'lucide-react';
 import CustomerSelectorTable from './CustomerSelectorTable.jsx';
 import ProjectSelectorTable from './ProjectSelectorTable.jsx';
-import { customerService, projectService } from '@compartido/services';
+import { customerService, projectService } from '@compartido/servicios';
 
 const EtapaObrasCliente = ({ data, onChange, errors = {} }) => {
   const [localData, setLocalData] = useState({

@@ -26,7 +26,7 @@ import {
 } from 'lucide-react';
 
 import useAdminHook from '@compartido/hooks/useAdminHook';
-import { useNotifications } from '@compartido/hooks/useNotifications';
+import { useNotifications } from '@compartido/hooks/useNotificaciones';
 import UserModal from './UserModal';
 
 const AdminDashboard = ({ timePeriod = '30d' }) => {

@@ -22,7 +22,7 @@ import {
   Calendar
 } from 'lucide-react';
 import { useUpdateMaterialStock, useMaterialStockByPlant } from '@compartido/hooks/useMaterialsHook';
-import { useNotifications } from '@compartido/hooks/useNotifications';
+import { useNotifications } from '@compartido/hooks/useNotificaciones';
 
 const MaterialStockModal = ({ material, zones, onClose }) => {
   const [stockData, setStockData] = useState({});

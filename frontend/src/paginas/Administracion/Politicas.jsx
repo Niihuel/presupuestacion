@@ -14,7 +14,7 @@ import {
   Percent, Calculator, Package, Truck, AlertCircle, CheckCircle,
   Info, HelpCircle
 } from 'lucide-react';
-import { roundPercent, trackLegacyUsage } from '@compartido/utils/rounding';
+import { roundPercent, trackLegacyUsage } from '@compartido/utilidades/redondeo.js';
 
 const Politicas = () => {
   const [loading, setLoading] = useState(false);
@@ -56,7 +56,7 @@ const Politicas = () => {
   const loadPolicies = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/policies');
+      const response = await fetch('/api/v1/policies');
       if (response.ok) {
         const data = await response.json();
         setPolicies(data.data || data);
@@ -75,7 +75,7 @@ const Politicas = () => {
     setMessage(null);
     
     try {
-      const response = await fetch('/api/policies', {
+      const response = await fetch('/api/v1/policies', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(policies)

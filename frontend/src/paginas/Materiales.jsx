@@ -39,9 +39,9 @@ import {
   useMaterials, 
   useMaterialsStats,
   useDeleteMaterial 
-} from '@shared/hooks/useMaterialsHook';
-import { useZones } from '@shared/hooks/useZonesHook';
-import { useNotifications } from '@shared/hooks/useNotifications';
+} from '@compartido/hooks/useMateriales';
+import { useZonas as useZones } from '@compartido/hooks/useZonas';
+import { useNotificaciones as useNotifications } from '@compartido/hooks/useNotificaciones';
 
 // Componentes
 import MaterialCard from '@features/materials/components/MaterialCard.jsx';
@@ -51,7 +51,7 @@ import MaterialDeleteModal from '@features/materials/components/MaterialDeleteMo
 import MaterialStockModal from '@features/materials/components/MaterialStockModal.jsx';
 import MaterialPriceHistoryModal from '@features/materials/components/MaterialPriceHistoryModal.jsx';
 import MaterialWhereUsed from '@componentes/materials/components/MaterialWhereUsed';
-import DialogoConfirmacion from '@compartido/components/DialogoConfirmacion';
+import DialogoConfirmacion from '@compartido/componentes/DialogoConfirmacion';
 
 const Materiales = () => {
   // Estados locales

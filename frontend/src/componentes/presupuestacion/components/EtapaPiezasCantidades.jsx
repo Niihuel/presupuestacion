@@ -7,8 +7,8 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Package, Plus, Trash2, AlertCircle, Search, Calculator, Weight, Factory } from 'lucide-react';
-import { pieceService, zoneService } from '@compartido/services';
-import { useNotifications } from '@compartido/hooks/useNotifications';
+import { pieceService, zoneService } from '@compartido/servicios';
+import { useNotifications } from '@compartido/hooks/useNotificaciones';
 
 const EtapaPiezasCantidades = ({ data, onChange, errors = {} }) => {
   const [localData, setLocalData] = useState({

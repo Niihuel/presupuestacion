@@ -6,7 +6,7 @@
  */
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { authService } from '@compartido/services';
+import { authService } from '@compartido/servicios';
 import { useAuthStore } from '@nucleo/store/auth.store';
 import { toast } from 'sonner';
 

@@ -1,0 +1,7 @@
+/* 
+ * This file was previously used for CSS animations but has been deprecated
+ * in favor of Framer Motion for all animation needs.
+ * 
+ * All animations are now handled through React components using Framer Motion
+ * for better performance and to eliminate flickering issues.
+ */

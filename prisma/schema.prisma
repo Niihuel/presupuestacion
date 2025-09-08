@@ -1,0 +1,951 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider     = "sqlserver"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+// SQL Server no soporta enums nativos: usar strings validados en app
+
+model Company {
+  id        String   @id @default(cuid())
+  name      String
+  address   String?
+  taxId     String?  @map("tax_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  users     User[]
+  customers Customer[]
+  plants    Plant[]
+  trucks    Truck[]
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  users       User[]
+  permissions RolePermission[]
+}
+
+model Permission {
+  id          String  @id @default(cuid())
+  resource    String
+  action      String
+  description String?
+
+  roles RolePermission[]
+
+  @@unique([resource, action])
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+  description  String?    // Optional description of why this permission is assigned to this role
+  assignedAt   DateTime   @default(now()) @map("assigned_at")
+  assignedBy   String?    @map("assigned_by") // Who assigned this permission
+  role         Role       @relation(fields: [roleId], references: [id])
+  permission   Permission @relation(fields: [permissionId], references: [id])
+
+  @@id([roleId, permissionId])
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?   // NextAuth compatibility
+  firstName     String?   @map("first_name")
+  lastName      String?   @map("last_name")
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  passwordHash  String?   @map("password_hash")
+  isSuperAdmin  Boolean   @default(false) @map("is_super_admin")
+  active        Boolean   @default(true)
+  createdAt     DateTime  @default(now()) @map("created_at")
+  
+  // Manual registration approval system
+  isApproved    Boolean   @default(false) @map("is_approved")
+  approvedAt    DateTime? @map("approved_at")
+  approvedBy    String?   @map("approved_by")
+  rejectedAt    DateTime? @map("rejected_at")
+  rejectionReason String? @map("rejection_reason")
+  registrationToken String? @map("registration_token")
+  
+  // OAuth provider info
+  provider      String?   // 'manual', 'google'
+  providerId    String?   @map("provider_id")
+  
+  // Contact info for manual registration
+  phone         String?
+  department    String?
+  position      String?
+
+  roleId String?
+  role   Role?   @relation(fields: [roleId], references: [id])
+
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+
+  accounts           Account[]
+  sessions           Session[]
+  loginHistory       LoginHistory[]
+  budgets            Budget[]
+  soldBudgets        Budget[]            @relation("Seller")
+  budgetTrackings    BudgetTracking[]
+  budgetObservations BudgetObservation[]
+  auditLogs          AuditLog[]
+  stockMovements     StockMovement[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.NVarChar(Max)
+  access_token      String? @db.NVarChar(Max)
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.NVarChar(Max)
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id])
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  createdAt    DateTime @default(now()) @map("created_at")
+  lastActivity DateTime @default(now()) @map("last_activity")
+  ipAddress    String?  @map("ip_address")
+  userAgent    String?  @map("user_agent")
+  isActive     Boolean  @default(true) @map("is_active")
+  user         User     @relation(fields: [userId], references: [id])
+
+  @@index([expires])
+  @@index([isActive, lastActivity])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model LoginHistory {
+  id        String   @id @default(cuid())
+  userId    String
+  ipAddress String?  @map("ip_address")
+  timestamp DateTime @default(now())
+  success   Boolean
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+/// CLIENTES Y OBRAS
+model Customer {
+  id            String   @id @default(cuid())
+  displayName   String?  @map("display_name")
+  companyName   String   @map("company_name")
+  taxId         String?  @map("tax_id")
+  address       String?
+  city          String?
+  province      String?
+  postalCode    String?  @map("postal_code")
+  phone         String?
+  email         String?
+  contactPerson String?  @map("contact_person")
+  activityType  String?  @map("activity_type")
+  customerType  String?  @map("customer_type")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+
+  projects Project[]
+  budgets  Budget[]
+  calendarEvents CalendarEvent[]
+}
+
+model Project {
+  id                      String   @id @default(cuid())
+  customerId              String
+  designerId              String?  @map("designer_id")
+  name                    String
+  description             String?
+  address                 String?
+  city                    String?
+  province                String?
+  postalCode              String?  @map("postal_code")
+  googleMapsUrl           String?  @map("google_maps_url")
+  distanceFromCordoba     Int?     @map("distance_from_cordoba")
+  distanceFromBuenosAires Int?     @map("distance_from_buenos_aires")
+  distanceFromVillaMaria  Int?     @map("distance_from_villa_maria")
+  status                  String?
+  createdAt               DateTime @default(now()) @map("created_at")
+
+  customer  Customer          @relation(fields: [customerId], references: [id])
+  designer  Designer?         @relation(fields: [designerId], references: [id])
+  files     ProjectFile[]
+  models3d  ProjectModel3D[]
+  budgets   Budget[]
+  trackings ProjectTracking[]
+  calendarEvents CalendarEvent[]
+}
+
+model Designer {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  email     String?
+  phone     String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  projects Project[]
+}
+
+model ProjectFile {
+  id         String   @id @default(cuid())
+  projectId  String
+  fileName   String   @map("file_name")
+  fileUrl    String   @map("file_url")
+  fileType   String   @map("file_type")
+  category   String?
+  size       Int?
+  uploadedAt DateTime @default(now()) @map("uploaded_at")
+  project    Project  @relation(fields: [projectId], references: [id])
+}
+
+model ProjectModel3D {
+  id           String   @id @default(cuid())
+  projectId    String
+  modelUrl     String   @map("model_url")
+  thumbnailUrl String?  @map("thumbnail_url")
+  createdAt    DateTime @default(now()) @map("created_at")
+  project      Project  @relation(fields: [projectId], references: [id])
+}
+
+/// PLANTAS Y PIEZAS
+model Plant {
+  id            String  @id @default(cuid())
+  name          String
+  location      String?
+  address       String?
+  googleMapsUrl String? @map("google_maps_url")
+  active        Boolean @default(true)
+
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+
+  pieces Piece[]
+  molds  Mold[]
+  stockItems StockItem[]
+  stockMovements StockMovement[]
+}
+
+model PieceFamily {
+  id          String  @id @default(cuid())
+  code        String  @unique
+  description String?
+  category    String?
+  // Configuración específica de familia
+  requiresMold       Boolean @default(false) @map("requires_mold")
+  requiresCables     Boolean @default(false) @map("requires_cables")
+  requiresVaporCycle Boolean @default(false) @map("requires_vapor_cycle")
+  maxCables          Int?    @map("max_cables")
+  defaultConcreteType String? @map("default_concrete_type")
+  
+  pieces      Piece[]
+  molds       Mold[]
+  pieceRecipes PieceRecipe[]
+}
+
+model Piece {
+  id                  String  @id @default(cuid())
+  familyId            String  @map("family_id")
+  plantId             String? @map("plant_id")
+  moldId              String? @map("mold_id")
+  description         String
+  weight              Float?
+  width               Float?
+  length              Float?
+  thickness           Float?
+  height              Float?
+  section             String?
+  volume              Float?
+  unitMeasure         String? @map("unit_measure")
+  priceCordoba        Float?  @map("price_cordoba")
+  priceBuenosAires    Float?  @map("price_buenos_aires")
+  priceVillaMaria     Float?  @map("price_villa_maria")
+  allowsOptional      Boolean @default(false) @map("allows_optional")
+  individualTransport Boolean @default(false) @map("individual_transport")
+  piecesPerTruck      Int?    @map("pieces_per_truck")
+  /// Nuevos campos para optimización
+  productionTime      Int?    @map("production_time")
+  concreteType        String? @map("concrete_type")
+  steelQuantity       Float?  @map("steel_quantity")
+  requiresEscort      Boolean @default(false) @map("requires_escort")
+  maxStackable        Int?    @map("max_stackable")
+  specialHandling     String? @map("special_handling")
+  // Campos específicos por familia
+  cableCount          Int?    @map("cable_count")
+  meshLayers          Int?    @map("mesh_layers")
+  hasAntiseismic      Boolean @default(false) @map("has_antiseismic")
+  hasInsulation       Boolean @default(false) @map("has_insulation")
+  trackLength         Float?  @map("track_length") // 50 o 102 metros
+  hasTelgopor         Boolean @default(false) @map("has_telgopor")
+  concreteSettlement  Float?  @map("concrete_settlement") // asentamiento en cm
+  
+  // Coeficientes polinómicos
+  steelPercent        Float   @default(0.4172) @map("steel_percent")
+  laborPercent        Float   @default(0.30969) @map("labor_percent")
+  concretePercent     Float   @default(0.207) @map("concrete_percent")
+  fuelPercent         Float   @default(0.101) @map("fuel_percent")
+
+  family      PieceFamily  @relation(fields: [familyId], references: [id])
+  plant       Plant?       @relation(fields: [plantId], references: [id])
+  mold        Mold?        @relation(fields: [moldId], references: [id])
+  budgetItems BudgetItem[]
+  budgetPieces BudgetPiece[]
+  recipes     PieceRecipe[]
+  materials   PieceMaterial[]
+  formulas    PieceFormula[] // Nueva relación BOM
+  freightPieces BudgetFreightPiece[]
+  stockItems  StockItem[]
+  stockMovements StockMovement[]
+}
+
+/// PRESUPUESTOS
+model Budget {
+  id                String       @id @default(cuid())
+  projectId         String
+  version           Int          @default(1)
+  customerId        String
+  userId            String       @map("user_id")
+  sellerId          String?      @map("seller_id")
+  status            String       @default("DRAFT") // DRAFT | PRESENTED | APPROVED | REJECTED | CANCELLED
+  parentBudgetId    String?      @map("parent_budget_id")
+  requestDate       DateTime?    @map("request_date")
+  budgetDate        DateTime?    @map("budget_date")
+  deliveryTerms     String?      @map("delivery_terms")
+  paymentConditions String?      @map("payment_conditions")
+  validityDays      Int?         @map("validity_days")
+  notes             String?
+  totalMaterials    Float?       @map("total_materials")
+  totalFreight      Float?       @map("total_freight")
+  totalAssembly     Float?       @map("total_assembly")
+  totalAdditionals  Float?       @map("total_additionals")
+  taxes             Float?
+  finalTotal        Float?       @map("final_total")
+  createdAt         DateTime     @default(now()) @map("created_at")
+  /// Gestión de borradores
+  isDraft           Boolean      @default(true) @map("is_draft")
+  draftStep         Int?         @default(1) @map("draft_step")
+  draftData         String?      @map("draft_data") @db.NVarChar(Max)
+  completedSteps    String       @default("[]") @map("completed_steps") @db.NVarChar(100)
+  /// Nota: En SQL Server un índice único en un campo NULL solo permite un único NULL.
+  /// Por compatibilidad, no se declara @unique aquí; garantizar unicidad en la app.
+  resumeToken       String?      @map("resume_token")
+  lastEditedAt      DateTime     @updatedAt @map("updated_at")
+
+  project       Project   @relation(fields: [projectId], references: [id])
+  customer      Customer  @relation(fields: [customerId], references: [id])
+  user          User      @relation(fields: [userId], references: [id])
+  seller        User?     @relation("Seller", fields: [sellerId], references: [id])
+  parentBudget  Budget?   @relation("BudgetVersions", fields: [parentBudgetId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  versions      Budget[]  @relation("BudgetVersions")
+
+  items               BudgetItem[]
+  additionals         BudgetAdditional[]
+  freight             BudgetFreight[]
+  pieces              BudgetPiece[]
+  tracking            BudgetTracking[]
+  observations        BudgetObservation[]
+  draftHistory        BudgetDraftHistory[]
+  projectTrackings    ProjectTracking[]
+  calendarEvents      CalendarEvent[]
+  freightCalculations FreightCalculation[] @relation("FreightCalculation")
+  stockMovements      StockMovement[]
+}
+
+model Additional {
+  id          String   @id @default(cuid())
+  description String
+  unit        String   // Ej: "Global", "m2", "Unidad"
+  price       Float
+  category    String?  // Categoria del adicional
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  createdBy   String?  @map("created_by")
+  
+  @@index([isActive])
+}
+
+/// GESTIÓN DE INVENTARIO
+model StockItem {
+  id       String @id @default(cuid())
+  pieceId  String @map("piece_id")
+  plantId  String @map("plant_id")
+  quantity Int
+  location String? // Ubicación específica dentro de la planta
+  
+  piece Piece @relation(fields: [pieceId], references: [id])
+  plant Plant @relation(fields: [plantId], references: [id])
+  
+  @@unique([pieceId, plantId])
+  @@index([pieceId])
+  @@index([plantId])
+  @@map("stock_items")
+}
+
+model StockMovement {
+  id        String   @id @default(cuid())
+  pieceId   String   @map("piece_id")
+  plantId   String   @map("plant_id")
+  quantity  Int      // Positivo para entradas, negativo para salidas
+  type      String   // Ej: "PRODUCTION_ENTRY", "DISPATCH_EXIT", "ADJUSTMENT"
+  budgetId  String?  @map("budget_id") // Opcional, para vincular a un despacho
+  notes     String?
+  createdAt DateTime @default(now()) @map("created_at")
+  userId    String   @map("user_id")
+  
+  piece  Piece   @relation(fields: [pieceId], references: [id])
+  plant  Plant   @relation(fields: [plantId], references: [id])
+  budget Budget? @relation(fields: [budgetId], references: [id])
+  user   User    @relation(fields: [userId], references: [id])
+  
+  @@index([pieceId])
+  @@index([plantId])
+  @@index([createdAt])
+  @@map("stock_movements")
+}
+
+model BudgetItem {
+  id          String  @id @default(cuid())
+  budgetId    String
+  pieceId     String
+  quantity    Int
+  truckNumber Int?    @map("truck_number") // Número de camión asignado
+  length      Float?
+  unitPrice   Float?  @map("unit_price")
+  adjustment  Float?
+  originPlant String? @map("origin_plant")
+  optional    Boolean @default(false)
+  subtotal    Float?
+  budget      Budget  @relation(fields: [budgetId], references: [id])
+  piece       Piece   @relation(fields: [pieceId], references: [id])
+}
+
+model BudgetAdditional {
+  id          String @id @default(cuid())
+  budgetId    String
+  description String
+  quantity    Int
+  unitPrice   Float  @map("unit_price")
+  total       Float
+  budget      Budget @relation(fields: [budgetId], references: [id])
+}
+
+/// PARÁMETROS Y PRECIOS
+model Parameter {
+  id            String   @id @default(cuid())
+  name          String   @unique
+  value         Float
+  unit          String?
+  effectiveDate DateTime @map("effective_date")
+  createdBy     String?  @map("created_by")
+  
+  history       ParameterHistory[]
+}
+
+model ParameterHistory {
+  id            String   @id @default(cuid())
+  parameterId   String   @map("parameter_id")
+  parameter     Parameter @relation(fields: [parameterId], references: [id])
+  value         Float
+  effectiveDate DateTime @map("effective_date")
+  createdBy     String?  @map("created_by")
+  createdAt     DateTime @default(now()) @map("created_at")
+  
+  @@index([parameterId])
+  @@index([effectiveDate])
+}
+
+model MaterialPrice {
+  id                   String   @id @default(cuid())
+  materialType         String   @map("material_type")
+  price                Float
+  unit                 String?
+  effectiveDate        DateTime @map("effective_date")
+  adjustmentPercentage Float?   @map("adjustment_percentage")
+}
+
+model FreightRate {
+  id              String   @id @default(cuid())
+  origin          String   // CO (Córdoba), BA (Buenos Aires), VM (Villa Mercedes)
+  kmFrom          Int      @map("km_from")
+  kmTo            Int      @map("km_to")
+  rateUnder12m    Float    @map("rate_under_12m")  // Tarifa para piezas <= 12m
+  rateOver12m     Float    @map("rate_over_12m")   // Tarifa para piezas > 12m
+  minCapacity     Float    @default(24) @map("min_capacity") // Capacidad mínima en toneladas
+  effectiveDate   DateTime @map("effective_date")
+  expirationDate  DateTime? @map("expiration_date")
+  isActive        Boolean  @default(true) @map("is_active")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+  
+  @@unique([origin, kmFrom, kmTo, effectiveDate])
+  @@index([origin, isActive])
+  @@index([effectiveDate, expirationDate])
+}
+
+model AssemblyRate {
+  id            String @id @default(cuid())
+  kmFrom        Int    @map("km_from")
+  kmTo          Int    @map("km_to")
+  rateUnder100t Float  @map("rate_under_100t")
+  rate100_300t  Float  @map("rate_100_300t")
+  rateOver300t  Float  @map("rate_over_300t")
+}
+
+model PolynomialFormula {
+  id                String   @id @default(cuid())
+  name              String?  @map("name")
+  steelCoefficient  Float?   @map("steel_coefficient")
+  laborCoefficient  Float?   @map("labor_coefficient")
+  concreteCoefficient Float? @map("concrete_coefficient")
+  fuelCoefficient   Float?   @map("fuel_coefficient")
+  steelWeight       Float?   @map("steel_weight")
+  laborWeight       Float?   @map("labor_weight")
+  concreteWeight     Float?  @map("concrete_weight")
+  dieselWeight      Float?   @map("diesel_weight")
+  effectiveDate     DateTime @map("effective_date")
+  expirationDate    DateTime? @map("expiration_date")
+  isActive          Boolean  @default(false) @map("is_active")
+  notes             String?  @map("notes")
+  createdBy         String?  @map("created_by")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  @@index([name])
+}
+
+/// CAMIONES Y LOGÍSTICA
+model Truck {
+  id             String  @id @default(cuid())
+  companyId      String?
+  plate          String  @unique
+  brand          String?
+  model          String?
+  capacityTons   Float?  @map("capacity_tons")
+  maxLength      Float?  @map("max_length")
+  maxPieces      Int?    @map("max_pieces")
+  isCompanyOwned Boolean @default(false) @map("is_company_owned")
+  active         Boolean @default(true)
+  truckType      String  @default("STANDARD") @map("truck_type") // STANDARD, SPECIAL, EXTENDED
+  minBillableTons Float? @default(21.0) @map("min_billable_tons") // Minimum tons to bill (falso flete)
+  description    String? // Additional description or notes
+
+  company Company? @relation(fields: [companyId], references: [id])
+}
+
+model FreightCalculation {
+  id           String @id @default(cuid())
+  budgetId     String
+  originPlant  String @map("origin_plant")
+  destination  String
+  distanceKm   Int    @map("distance_km")
+  truckLoads   Int    @map("truck_loads")
+  falseTonnage Float? @map("false_tonnage")
+  totalCost    Float  @map("total_cost")
+  budget       Budget @relation("FreightCalculation", fields: [budgetId], references: [id])
+}
+
+// Modelo para el detalle de flete por camión
+model BudgetFreight {
+  id           String   @id @default(cuid())
+  budgetId     String
+  truckNumber  Int      @map("truck_number")
+  realWeight   Float    @map("real_weight")
+  falseWeight  Float    @map("false_weight")
+  maxCapacity  Float    @map("max_capacity")
+  pieceCount   Int      @map("piece_count")
+  over12m      Boolean  @default(false)
+  requiresEscort Boolean @default(false) @map("requires_escort")
+  cost         Float
+  createdAt    DateTime @default(now())
+  budget       Budget   @relation(fields: [budgetId], references: [id])
+  pieces       BudgetFreightPiece[]
+}
+
+model BudgetFreightPiece {
+  id               String        @id @default(cuid())
+  budgetFreightId  String        @map("budget_freight_id")
+  pieceId          String        @map("piece_id")
+  quantity         Int           @default(1)
+  budgetFreight    BudgetFreight @relation(fields: [budgetFreightId], references: [id])
+  piece            Piece         @relation(fields: [pieceId], references: [id])
+
+  @@unique([budgetFreightId, pieceId])
+  @@map("budget_freight_pieces")
+}
+
+model BudgetPiece {
+  id                   String   @id @default(cuid())
+  budgetId             String   @map("budget_id")
+  pieceId              String   @map("piece_id")
+  quantity             Int
+  unitPrice            Float    @map("unit_price")
+  totalPrice           Float    @map("total_price")
+  transportKm          Int?     @map("transport_km")
+  specialRequirements  String?  @map("special_requirements")
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @updatedAt @map("updated_at")
+
+  budget Budget @relation(fields: [budgetId], references: [id])
+  piece  Piece  @relation(fields: [pieceId], references: [id])
+
+  @@unique([budgetId, pieceId])
+  @@index([budgetId])
+  @@index([pieceId])
+  @@map("budget_pieces")
+}
+
+/// SEGUIMIENTO
+model BudgetTracking {
+  id        String   @id @default(cuid())
+  budgetId  String
+  status    String
+  comments  String?
+  changedBy String   @map("changed_by")
+  changedAt DateTime @default(now()) @map("changed_at")
+  budget    Budget   @relation(fields: [budgetId], references: [id])
+  user      User     @relation(fields: [changedBy], references: [id])
+}
+
+model BudgetObservation {
+  id              String    @id @default(cuid())
+  budgetId        String
+  observation     String
+  nextContactDate DateTime? @map("next_contact_date")
+  alertEnabled    Boolean   @default(false) @map("alert_enabled")
+  createdBy       String    @map("created_by")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  budget          Budget    @relation(fields: [budgetId], references: [id])
+  user            User      @relation(fields: [createdBy], references: [id])
+}
+
+/// HISTORIAL DE GUARDADOS DE BORRADOR
+model BudgetDraftHistory {
+  id       String   @id @default(cuid())
+  budgetId String
+  step     Int
+  data     String   @db.NVarChar(Max)
+  savedAt  DateTime @default(now()) @map("saved_at")
+  budget   Budget   @relation(fields: [budgetId], references: [id])
+
+  @@index([budgetId, step])
+}
+
+/// SEGUIMIENTO DE PROYECTOS (CALENDARIO)
+model ProjectTracking {
+  id            String    @id @default(cuid())
+  projectId     String
+  budgetId      String?
+  type          String // llamada | visita | email | reunion
+  status        String // pendiente | completado | cancelado
+  scheduledDate DateTime
+  completedDate DateTime?
+  notes         String?
+
+  // Notificaciones
+  reminderDays String    @default("[7,3,1]") // guardado como JSON string
+  lastReminder DateTime?
+
+  project       Project                @relation(fields: [projectId], references: [id])
+  budget        Budget?                @relation(fields: [budgetId], references: [id])
+  notifications TrackingNotification[]
+
+  @@index([scheduledDate, status])
+}
+
+model TrackingNotification {
+  id         String   @id @default(cuid())
+  trackingId String
+  sentAt     DateTime @default(now())
+  type       String // email | system | whatsapp
+  recipient  String
+  status     String // sent | read | failed
+
+  tracking ProjectTracking @relation(fields: [trackingId], references: [id])
+}
+
+/// ALERTAS DEL SISTEMA
+model SystemAlert {
+  id        String   @id @default(cuid())
+  level     String // info | warning | critical
+  message   String
+  createdAt DateTime @default(now()) @map("created_at")
+  read      Boolean  @default(false)
+
+  @@index([createdAt])
+}
+
+/// MOLDES Y MATERIALES
+model Mold {
+  id          String  @id @default(cuid())
+  familyId    String  @map("family_id")
+  code        String  @unique
+  description String?
+  plantId     String? @map("plant_id")
+  active      Boolean @default(true)
+  
+  family PieceFamily @relation(fields: [familyId], references: [id])
+  plant  Plant?      @relation(fields: [plantId], references: [id])
+  pieces Piece[]
+}
+
+model Material {
+  id                String   @id @default(cuid())
+  code              String   @unique
+  name              String
+  category          String   // hormigon | acero | aditivo | accesorio | energia
+  unit              String   // m3 | kg | lt | un | kWh
+  currentPrice      Float    @map("current_price")
+  lastPriceUpdate   DateTime @map("last_price_update")
+  supplier          String?
+  minimumStock      Float?   @map("minimum_stock")
+  active            Boolean  @default(true)
+  
+  priceHistory  MaterialPriceHistory[]
+  recipeDetails PieceRecipeDetail[]
+  pieceMaterials PieceMaterial[]
+  pieceFormulas PieceFormula[] // Nueva relación BOM
+}
+
+model MaterialPriceHistory {
+  id             String   @id @default(cuid())
+  materialId     String   @map("material_id")
+  price          Float
+  changeReason   String?  @map("change_reason")
+  changePercent  Float?   @map("change_percent")
+  effectiveDate  DateTime @map("effective_date")
+  createdBy      String?  @map("created_by")
+  createdAt      DateTime @default(now()) @map("created_at")
+  
+  material Material @relation(fields: [materialId], references: [id])
+}
+
+model PieceRecipe {
+  id               String   @id @default(cuid())
+  pieceId          String   @map("piece_id")
+  familyId         String   @map("family_id")
+  moldId           String?  @map("mold_id")
+  name             String
+  version          Int      @default(1)
+  active           Boolean  @default(true)
+  laborHours       Float?   @map("labor_hours")
+  equipmentHours   Float?   @map("equipment_hours")
+  vaporCycleHours  Float?   @map("vapor_cycle_hours")
+  vaporTemperature String?  @map("vapor_temperature") // JSON array de temperaturas
+  createdAt        DateTime @default(now()) @map("created_at")
+  
+  piece        Piece               @relation(fields: [pieceId], references: [id])
+  family       PieceFamily         @relation(fields: [familyId], references: [id])
+  recipeDetails PieceRecipeDetail[]
+}
+
+model PieceRecipeDetail {
+  id           String  @id @default(cuid())
+  recipeId     String  @map("recipe_id")
+  materialId   String  @map("material_id")
+  quantity     Float
+  unit         String
+  isOptional   Boolean @default(false) @map("is_optional")
+  notes        String?
+  
+  recipe   PieceRecipe @relation(fields: [recipeId], references: [id])
+  material Material    @relation(fields: [materialId], references: [id])
+  
+  @@unique([recipeId, materialId])
+}
+
+/// CALENDARIO DE EVENTOS
+model CalendarEvent {
+  id              String    @id @default(cuid())
+  title           String
+  description     String?
+  date            DateTime
+  startTime       String?   @map("start_time")
+  endTime         String?   @map("end_time")
+  category        String    // presupuestacion | plazo | reunión | seguimiento | personal
+  priority        String?   @default("media") // baja | media | alta | crítica
+  status          String?   @default("pendiente") // pendiente | en_progreso | completado | vencido
+  budgetId        String?   @map("budget_id")
+  projectId       String?   @map("project_id")
+  clientId        String?   @map("client_id")
+  daysUntilExpiry Int?      @map("days_until_expiry")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  budget  Budget?   @relation(fields: [budgetId], references: [id])
+  project Project?  @relation(fields: [projectId], references: [id])
+  client  Customer? @relation(fields: [clientId], references: [id])
+
+  @@index([date])
+  @@index([category])
+  @@index([status])
+}
+
+/// RELACIÓN PIEZA-MATERIAL (LEGACY - kept for compatibility)
+model PieceMaterial {
+  id           String   @id @default(cuid())
+  pieceId      String   @map("piece_id")
+  materialId   String   @map("material_id")
+  quantity     Float
+  scrapPercent Float    @default(0) @map("scrap_percent") // Porcentaje de desperdicio
+  notes        String?
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  
+  piece    Piece    @relation(fields: [pieceId], references: [id])
+  material Material @relation(fields: [materialId], references: [id])
+  
+  @@unique([pieceId, materialId])
+  @@index([pieceId])
+  @@index([materialId])
+}
+
+/// FÓRMULAS BOM (Bill of Materials) - NUEVA ESTRUCTURA PRINCIPAL
+model PieceFormula {
+  id         String  @id @default(cuid())
+  pieceId    String  @map("piece_id")
+  materialId String  @map("material_id")
+  quantity   Float   // cantidad por unidad de pieza
+  scrap      Float   @default(0) // porcentaje de desperdicio (0-100)
+  unit       String  // kg, m³, m², tn, etc.
+  notes      String?
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  
+  piece    Piece    @relation(fields: [pieceId], references: [id])
+  material Material @relation(fields: [materialId], references: [id])
+  
+  @@unique([pieceId, materialId])
+  @@index([pieceId])
+  @@index([materialId])
+  @@map("piece_formulas")
+}
+
+/// ESCALA DE AJUSTES
+model AdjustmentScale {
+  id                   String   @id @default(cuid())
+  name                 String
+  version              Int
+  description          String?
+  generalDiscount      Float    @default(-15.0) @map("general_discount")     // -15%
+  generalAdjustment    Float    @default(311.365) @map("general_adjustment") // +311.365%
+  specialAdjustment    Float?   @default(-20.0) @map("special_adjustment")   // -20% for special pieces
+  specialCategories    String   @default("TT,PLACAS_PLANAS") @map("special_categories") // Categories that get special adjustment (comma-separated)
+  effectiveDate        DateTime @unique @map("effective_date")
+  expirationDate       DateTime? @map("expiration_date")
+  isActive             Boolean  @default(false) @map("is_active")
+  scales               String   @db.NVarChar(Max) // Escala de ajustes por rango de días (JSON string)
+  createdBy            String?  @map("created_by")
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @updatedAt @map("updated_at")
+  
+  @@unique([name, version])
+  @@index([isActive, effectiveDate])
+}
+
+/// PARÁMETROS DE COSTOS GENERALES
+model CostParameter {
+  id                String   @id @default(cuid())
+  name              String   @unique
+  category          String   // ENERGY, LABOR, OVERHEAD, TRANSPORT, OTHER
+  unit              String
+  value             Float
+  description       String?
+  effectiveDate     DateTime @map("effective_date")
+  expirationDate    DateTime? @map("expiration_date")
+  isActive          Boolean  @default(true) @map("is_active")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  
+  @@index([category, isActive])
+  @@index([effectiveDate, expirationDate])
+}
+
+/// COTIZACIÓN DEL DÓLAR
+model DollarExchangeRate {
+  id               String   @id @default(cuid())
+  date             DateTime @unique
+  officialRate     Float    @map("official_rate")
+  blueRate         Float?   @map("blue_rate")
+  mepRate          Float?   @map("mep_rate")
+  source           String   @default("BCRA")
+  notes            String?
+  createdAt        DateTime @default(now()) @map("created_at")
+  
+  @@index([date])
+}
+
+
+/// ÍNDICES MENSUALES PARA FÓRMULA POLINÓMICA
+model MonthlyIndex {
+  id               String   @id @default(cuid())
+  month            Int
+  year             Int
+  steelIndex       Float    @map("steel_index")       // Calculado automáticamente desde variación del dólar
+  laborIndex       Float    @map("labor_index")
+  concreteIndex    Float    @map("concrete_index")
+  fuelIndex        Float    @map("fuel_index")
+  dollar           Float    // Valor del dólar oficial de referencia para ese mes
+  generalIndex     Float?   @map("general_index")
+  dollarRate       Float    @map("dollar_rate")       // Cotización del dólar oficial ARS/USD
+  steelVariation   Float?   @map("steel_variation")   // Variación del acero respecto al mes anterior
+  dollarVariation  Float?   @map("dollar_variation")  // Variación del dólar respecto al mes anterior
+  source           String?  @default("MANUAL")        // Fuente del índice (ej: INDEC, CAMARA, MANUAL, CALCULATED)
+  notes            String?
+  createdBy        String?  @map("created_by")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+  
+  @@unique([month, year])
+  @@index([year, month])
+  @@index([dollarRate])
+}
+
+/// AUDITORÍA GENERAL
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id])
+  action     String
+  resource   String
+  resourceId String?
+  detail     String?
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([createdAt])
+}
